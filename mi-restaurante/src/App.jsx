@@ -14,10 +14,41 @@ const PLATOS_INICIALES = [
     esMarisco: false,
     esAlcohol: false,
     esCarne: true,
+    esSandwitch: false,
     ingredientes: ["Lechuga", "Pollo", "Crutones", "Queso parmesano", "Aderezo césar"],
   },
     {
     id: "2",
+    nombre: "Ensalada Caprese",
+    descripcion: "Ensalada italiana con tomate, mozzarella y albahaca.",
+    precio: 7990,
+    tipo: "entrada",
+    esFrio: true,
+    esVegano: false,
+    esPasta: false,
+    esMarisco: false,
+    esAlcohol: false,
+    esCarne: false,
+    esSandwitch: false,
+    ingredientes: ["Tomate", "Mozzarella", "Albahaca"],
+  },
+    {
+    id: "3",
+    nombre: "Ensalada mixta de tofu",
+    descripcion: "Ensalada fresca con variedad de vegetales, tofu y aderezo de limón.",
+    precio: 6990,
+    tipo: "entrada",
+    esFrio: true,
+    esVegano: true,
+    esPasta: false,
+    esMarisco: false,
+    esAlcohol: false,
+    esCarne: false,
+    esSandwitch: false,
+    ingredientes: ["Lechuga", "Tomate", "Pepino", "Zanahoria", "Tofu","Aderezo de limón"],
+  },
+    {
+    id: "4",
     nombre: "Ostiones a la parmesana",
     descripcion: "8 Ostiones gratinados con queso parmesano y cilantro.",
     precio: 12900,
@@ -28,10 +59,11 @@ const PLATOS_INICIALES = [
     esMarisco: true,
     esAlcohol: false,
     esCarne: false,
+    esSandwitch: false,
     ingredientes: ["Ostiones", "Queso parmesano", "Cilantro", "Mantequilla" ],
   },
     {
-    id: "3",
+    id: "5",
     nombre: "Camarones apanados",
     descripcion: "Camarones apanados y fritos, servidos con salsa agridulce.",
     precio: 8990,
@@ -42,10 +74,11 @@ const PLATOS_INICIALES = [
     esMarisco: true,
     esAlcohol: false,
     esCarne: false,
+    esSandwitch: false,
     ingredientes: ["Camarones", "Harina", "Huevo", "Pan rallado", "Salsa agridulce"],
   },
     {
-    id: "4",
+    id: "6",
     nombre: "Gyosas",
     descripcion: "5 unidades de empanadillas asiaticas rellenas de cerdo y verduras.",
     precio: 6990,
@@ -56,10 +89,11 @@ const PLATOS_INICIALES = [
     esMarisco: false,
     esAlcohol: false,
     esCarne: true,
+    esSandwitch: false,
     ingredientes: ["Cerdo", "Repollo", "Sesamo","Soya", "Harina", "Aceite"],
   },
     {
-    id: "5",
+    id: "7",
     nombre: "Locos",
     descripcion: "Locos con mayonesa y limón.",
     precio: 11990,
@@ -70,7 +104,53 @@ const PLATOS_INICIALES = [
     esMarisco: true,
     esAlcohol: false,
     esCarne: false,
+    esSandwitch: false,
     ingredientes: ["Locos", "Mayonesa", "Limón","Lechuga"],
+  },
+    {
+    id: "8",
+    nombre: "Falafel",
+    descripcion: "Croquetas fritas de garbanzos y especias, servidas con salsa de yogur.",
+    precio: 5990,
+    tipo: "entrada",
+    esFrio: false,
+    esVegano: true,
+    esPasta: false,
+    esMarisco: false,
+    esAlcohol: false,
+    esCarne: false,
+    esSandwitch: false,
+    ingredientes: ["Garbanzos","Mix de especias", "Perejil", "Cebollín","Harina", "Aceite", "Salsa de yogur"],
+  },
+    {
+    id: "9",
+    nombre: "Empanadas de queso",
+    descripcion: "Empanadas rellenas de queso derretido.",
+    precio: 6990,
+    tipo: "entrada",
+    esFrio: false,
+    esVegano: false,
+    esPasta: false,
+    esMarisco: false,
+    esAlcohol: false,
+    esCarne: false,
+    esSandwitch: false,
+    ingredientes: ["Queso", "Harina", "Aceite", "Huevo"],
+  },
+    {
+    id: "10",
+    nombre: "Crema de zapallo",
+    descripcion: "Sopa cremosa de zapallo con un toque de crema y especias.",
+    precio: 6990,
+    tipo: "entrada",
+    esFrio: false,
+    esVegano: false,
+    esPasta: false,
+    esMarisco: false,
+    esAlcohol: false,
+    esCarne: false,
+    esSandwitch: false,
+    ingredientes: ["Zapallo", "Cebolla", "Crema", "Caldo de verduras", "Mix de especias"],
   },
   {
     id: "",
@@ -84,6 +164,7 @@ const PLATOS_INICIALES = [
     esMarisco: false,
     esAlcohol: false,
     esCarne: false,
+    esSandwitch: false,
     ingredientes: ["Láminas de pasta", "Zanahoria", "Zapallo italiano", "Tomate", "Salsa de tomate"],
   },
   {
@@ -98,6 +179,7 @@ const PLATOS_INICIALES = [
     esMarisco: false,
     esAlcohol: false,
     esCarne: false,
+    esSandwitch: false,
     ingredientes: ["Bizcotelas", "Café", "Queso mascarpone", "Cacao en polvo"],
   },
 ];
@@ -114,6 +196,7 @@ const [soloPastas, setSoloPastas] = useState(false);
 const [soloMariscos, setSoloMariscos] = useState(false);
 const [soloAlcohol, setSoloAlcohol] = useState(false);
 const [soloCarnes, setSoloCarnes] = useState(false);
+const [soloSandwitches, setSoloSandwitches] = useState(false);
 
 const [editando, setEditando] = useState(null);
 const [form, setForm] = useState({
@@ -127,6 +210,7 @@ const [form, setForm] = useState({
   esMarisco: false,
   esAlcohol: false,
   esCarne: false,
+  esSandwitch: false,
   ingredientesTexto: "",
 });
 
@@ -155,10 +239,11 @@ const [pedido, setPedido] = useState([]);
       if (soloMariscos && !plato.esMarisco) return false;
       if (soloAlcohol && !plato.esAlcohol) return false;
       if (soloCarnes && !plato.esCarne) return false;
+      if (soloSandwitches && !plato.esSandwitch) return false;
 
       return true;
     });
-  }, [platos, busqueda, tipo, soloFríos, soloVeganos, soloPastas, soloMariscos, soloAlcohol, soloCarnes]);
+  }, [platos, busqueda, tipo, soloFríos, soloVeganos, soloPastas, soloMariscos, soloAlcohol, soloCarnes, soloSandwitches]);
   const handleChangeForm = (e) => {
     const { name, value, type, checked } = e.target;
     setForm((f) => ({
@@ -180,6 +265,7 @@ const [pedido, setPedido] = useState([]);
       esMarisco: false,
       esAlcohol: false,
       esCarne: false,
+      esSandwitch: false,
       ingredientesTexto: "",
     });
   };
@@ -231,6 +317,7 @@ const handleEditar = (plato) => {
     esMarisco: plato.esMarisco,
     esAlcohol: plato.esAlcohol,
     esCarne: plato.esCarne,
+    esSandwitch: plato.esSandwitch,
     ingredientesTexto: plato.ingredientes?.join(", ") || "",
   });
 };
@@ -326,6 +413,15 @@ const handleEditar = (plato) => {
                   onChange={(e) => setSoloCarnes(e.target.checked)}
                 />
                 Carnes
+              </label>
+
+              <label>
+                <input
+                  type="checkbox"
+                  checked={soloSandwitches}
+                  onChange={(e) => setSoloSandwitches(e.target.checked)}
+                />
+                Sandwitches y/o Hamburguesas
               </label>
             </div>
           </div>
@@ -468,7 +564,7 @@ const handleEditar = (plato) => {
                     checked={form.esFrio}
                     onChange={handleChangeForm}
                   />
-                  Plato frío
+                  Preparaciones frias
                 </label>
 
                 <label>
@@ -478,7 +574,7 @@ const handleEditar = (plato) => {
                     checked={form.esVegano}
                     onChange={handleChangeForm}
                   />
-                  Vegano
+                  Apto para veganos
                 </label>
 
                 <label>
@@ -488,7 +584,7 @@ const handleEditar = (plato) => {
                     checked={form.esPasta}
                     onChange={handleChangeForm}
                   />
-                  Pasta
+                  Pastas
                 </label>
 
                 <label>
@@ -498,7 +594,7 @@ const handleEditar = (plato) => {
                     checked={form.esMarisco}
                     onChange={handleChangeForm}
                   />
-                  Marisco
+                  Mariscos
                 </label>
 
                 <label>
@@ -508,7 +604,7 @@ const handleEditar = (plato) => {
                     checked={form.esAlcohol}
                     onChange={handleChangeForm}
                   />
-                  Alcohol
+                  Bebidas alcohólicas
                 </label>
 
                 <label>
@@ -518,7 +614,17 @@ const handleEditar = (plato) => {
                     checked={form.esCarne}
                     onChange={handleChangeForm}
                   />
-                  Carne
+                  Carnes
+                </label>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    name="esSandwitch"
+                    checked={form.esSandwitch}
+                    onChange={handleChangeForm}
+                  />
+                  Sandwitches y/o Hamburguesas
                 </label>
               </div>
 
