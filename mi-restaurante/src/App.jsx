@@ -10,6 +10,10 @@ const PLATOS_INICIALES = [
     tipo: "entrada",
     esFrio: true,
     esVegano: false,
+    esPasta: false,
+    esMarisco: false,
+    esAlcohol: false,
+    esCarne: true,
     ingredientes: ["Lechuga", "Pollo", "Crutones", "Queso parmesano", "Aderezo césar"],
   },
   {
@@ -20,6 +24,10 @@ const PLATOS_INICIALES = [
     tipo: "fondo",
     esFrio: false,
     esVegano: true,
+    esPasta: true,
+    esMarisco: false,
+    esAlcohol: false,
+    esCarne: false,
     ingredientes: ["Láminas de pasta", "Zanahoria", "Zapallo italiano", "Tomate", "Salsa de tomate"],
   },
   {
@@ -30,6 +38,10 @@ const PLATOS_INICIALES = [
     tipo: "postre",
     esFrio: true,
     esVegano: false,
+    esPasta: false,
+    esMarisco: false,
+    esAlcohol: false,
+    esCarne: false,
     ingredientes: ["Bizcotelas", "Café", "Queso mascarpone", "Cacao en polvo"],
   },
 ];
@@ -42,6 +54,10 @@ const [busqueda, setBusqueda] = useState("");
 const [tipo, setTipo] = useState("todos");
 const [soloFríos, setSoloFríos] = useState(false);
 const [soloVeganos, setSoloVeganos] = useState(false);
+const [soloPastas, setSoloPastas] = useState(false);
+const [soloMariscos, setSoloMariscos] = useState(false);
+const [soloAlcohol, setSoloAlcohol] = useState(false);
+const [soloCarnes, setSoloCarnes] = useState(false);
 
 const [editando, setEditando] = useState(null);
 const [form, setForm] = useState({
@@ -51,11 +67,15 @@ const [form, setForm] = useState({
   tipo: "entrada",
   esFrio: false,
   esVegano: false,
-  ingredientesTexto: "",   // <- nuevo campo para ingresar ingredientes
+  esPasta: false,
+  esMarisco: false,
+  esAlcohol: false,
+  esCarne: false,
+  ingredientesTexto: "",
 });
 
 
-const [platoActivoId, setPlatoActivoId] = useState(null); // <- nuevo
+const [platoActivoId, setPlatoActivoId] = useState(null);
 const [pedido, setPedido] = useState([]);
   const agregarAlPedido = (plato) => {
     setPedido((prev) => [...prev, plato]);
@@ -75,11 +95,14 @@ const [pedido, setPedido] = useState([]);
       if (tipo !== "todos" && plato.tipo !== tipo) return false;
       if (soloFríos && !plato.esFrio) return false;
       if (soloVeganos && !plato.esVegano) return false;
+      if (soloPastas && !plato.esPasta) return false;
+      if (soloMariscos && !plato.esMarisco) return false;
+      if (soloAlcohol && !plato.esAlcohol) return false;
+      if (soloCarnes && !plato.esCarne) return false;
 
       return true;
     });
-  }, [platos, busqueda, tipo, soloFríos, soloVeganos]);
-
+  }, [platos, busqueda, tipo, soloFríos, soloVeganos, soloPastas, soloMariscos, soloAlcohol, soloCarnes]);
   const handleChangeForm = (e) => {
     const { name, value, type, checked } = e.target;
     setForm((f) => ({
@@ -97,6 +120,11 @@ const [pedido, setPedido] = useState([]);
       tipo: "entrada",
       esFrio: false,
       esVegano: false,
+      esPasta: false,
+      esMarisco: false,
+      esAlcohol: false,
+      esCarne: false,
+      ingredientesTexto: "",
     });
   };
 
@@ -143,6 +171,10 @@ const handleEditar = (plato) => {
     tipo: plato.tipo,
     esFrio: plato.esFrio,
     esVegano: plato.esVegano,
+    esPasta: plato.esPasta,
+    esMarisco: plato.esMarisco,
+    esAlcohol: plato.esAlcohol,
+    esCarne: plato.esCarne,
     ingredientesTexto: plato.ingredientes?.join(", ") || "",
   });
 };
@@ -202,6 +234,42 @@ const handleEditar = (plato) => {
                   onChange={(e) => setSoloVeganos(e.target.checked)}
                 />
                 Solo veganos
+              </label>
+
+              <label>
+                <input
+                  type="checkbox"
+                  checked={soloPastas}
+                  onChange={(e) => setSoloPastas(e.target.checked)}
+                />
+                Solo pastas
+              </label>
+
+              <label>
+                <input
+                  type="checkbox"
+                  checked={soloMariscos}
+                  onChange={(e) => setSoloMariscos(e.target.checked)}
+                />
+                Solo mariscos
+              </label>
+
+              <label>
+                <input
+                  type="checkbox"
+                  checked={soloAlcohol}
+                  onChange={(e) => setSoloAlcohol(e.target.checked)}
+                />
+                Solo alcohol
+              </label>
+
+              <label>
+                <input
+                  type="checkbox"
+                  checked={soloCarnes}
+                  onChange={(e) => setSoloCarnes(e.target.checked)}
+                />
+                Solo carnes
               </label>
             </div>
           </div>
@@ -355,6 +423,46 @@ const handleEditar = (plato) => {
                     onChange={handleChangeForm}
                   />
                   Vegano
+                </label>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    name="esPasta"
+                    checked={form.esPasta}
+                    onChange={handleChangeForm}
+                  />
+                  Pasta
+                </label>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    name="esMarisco"
+                    checked={form.esMarisco}
+                    onChange={handleChangeForm}
+                  />
+                  Marisco
+                </label>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    name="esAlcohol"
+                    checked={form.esAlcohol}
+                    onChange={handleChangeForm}
+                  />
+                  Alcohol
+                </label>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    name="esCarne"
+                    checked={form.esCarne}
+                    onChange={handleChangeForm}
+                  />
+                  Carne
                 </label>
               </div>
 
