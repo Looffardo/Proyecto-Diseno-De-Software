@@ -6,7 +6,7 @@ const PLATOS_INICIALES = [
     id: "1",
     nombre: "Ensalada César",
     descripcion: "Ensalada fresca con pollo y aderezo césar.",
-    precio: 6500,
+    precio: 6990,
     tipo: "entrada",
     esFrio: true,
     esVegano: false,
@@ -16,8 +16,64 @@ const PLATOS_INICIALES = [
     esCarne: true,
     ingredientes: ["Lechuga", "Pollo", "Crutones", "Queso parmesano", "Aderezo césar"],
   },
-  {
+    {
     id: "2",
+    nombre: "Ostiones a la parmesana",
+    descripcion: "8 Ostiones gratinados con queso parmesano y cilantro.",
+    precio: 12900,
+    tipo: "entrada",
+    esFrio: false,
+    esVegano: false,
+    esPasta: false,
+    esMarisco: true,
+    esAlcohol: false,
+    esCarne: false,
+    ingredientes: ["Ostiones", "Queso parmesano", "Cilantro", "Mantequilla" ],
+  },
+    {
+    id: "3",
+    nombre: "Camarones apanados",
+    descripcion: "Camarones apanados y fritos, servidos con salsa agridulce.",
+    precio: 8990,
+    tipo: "entrada",
+    esFrio: false,
+    esVegano: false,
+    esPasta: false,
+    esMarisco: true,
+    esAlcohol: false,
+    esCarne: false,
+    ingredientes: ["Camarones", "Harina", "Huevo", "Pan rallado", "Salsa agridulce"],
+  },
+    {
+    id: "4",
+    nombre: "Gyosas",
+    descripcion: "5 unidades de empanadillas asiaticas rellenas de cerdo y verduras.",
+    precio: 6990,
+    tipo: "entrada",
+    esFrio: false,
+    esVegano: false,
+    esPasta: false,
+    esMarisco: false,
+    esAlcohol: false,
+    esCarne: true,
+    ingredientes: ["Cerdo", "Repollo", "Sesamo","Soya", "Harina", "Aceite"],
+  },
+    {
+    id: "5",
+    nombre: "Locos",
+    descripcion: "Locos con mayonesa y limón.",
+    precio: 11990,
+    tipo: "entrada",
+    esFrio: true,
+    esVegano: false,
+    esPasta: false,
+    esMarisco: true,
+    esAlcohol: false,
+    esCarne: false,
+    ingredientes: ["Locos", "Mayonesa", "Limón","Lechuga"],
+  },
+  {
+    id: "",
     nombre: "Lasaña de verduras",
     descripcion: "Lasaña horneada con verduras de temporada.",
     precio: 8900,
@@ -31,7 +87,7 @@ const PLATOS_INICIALES = [
     ingredientes: ["Láminas de pasta", "Zanahoria", "Zapallo italiano", "Tomate", "Salsa de tomate"],
   },
   {
-    id: "3",
+    id: "",
     nombre: "Tiramisú",
     descripcion: "Postre frío clásico italiano.",
     precio: 5500,
@@ -224,7 +280,7 @@ const handleEditar = (plato) => {
                   checked={soloFríos}
                   onChange={(e) => setSoloFríos(e.target.checked)}
                 />
-                Solo fríos
+                Preparaciones frias
               </label>
 
               <label>
@@ -233,7 +289,7 @@ const handleEditar = (plato) => {
                   checked={soloVeganos}
                   onChange={(e) => setSoloVeganos(e.target.checked)}
                 />
-                Solo veganos
+                Apto para veganos
               </label>
 
               <label>
@@ -242,7 +298,7 @@ const handleEditar = (plato) => {
                   checked={soloPastas}
                   onChange={(e) => setSoloPastas(e.target.checked)}
                 />
-                Solo pastas
+                Pastas
               </label>
 
               <label>
@@ -251,7 +307,7 @@ const handleEditar = (plato) => {
                   checked={soloMariscos}
                   onChange={(e) => setSoloMariscos(e.target.checked)}
                 />
-                Solo mariscos
+                Mariscos
               </label>
 
               <label>
@@ -260,7 +316,7 @@ const handleEditar = (plato) => {
                   checked={soloAlcohol}
                   onChange={(e) => setSoloAlcohol(e.target.checked)}
                 />
-                Solo alcohol
+                Bebidas alcohólicas
               </label>
 
               <label>
@@ -269,7 +325,7 @@ const handleEditar = (plato) => {
                   checked={soloCarnes}
                   onChange={(e) => setSoloCarnes(e.target.checked)}
                 />
-                Solo carnes
+                Carnes
               </label>
             </div>
           </div>
