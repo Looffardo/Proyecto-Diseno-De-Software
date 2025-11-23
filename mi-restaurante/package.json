@@ -11,6 +11,8 @@
     "server": "node server/index.js"
   },
   "dependencies": {
+    "@react-oauth/google": "^0.12.2",
+    "dotenv": "^17.2.3",
     "google-auth-library": "^10.5.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"

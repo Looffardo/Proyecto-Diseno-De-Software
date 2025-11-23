@@ -10,5 +10,12 @@
     "nombre": "ignacia",
     "email": "mary.igna.mar.aya@gmail.com",
     "passwordHash": "$2b$10$1Uya4IGwO0izXq9FNt7F6.RV6WYBhJbJFRfLL0npQXLJF6/QJh4ji"
+  },
+  {
+    "id": "google-102562692617487707688",
+    "email": "valenmalov@gmail.com",
+    "nombre": "Valen Malov",
+    "passwordHash": null,
+    "viaGoogle": true
   }
 ]

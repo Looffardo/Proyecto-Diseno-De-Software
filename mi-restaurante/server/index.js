@@ -6,6 +6,8 @@ import path from 'path';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { fileURLToPath } from 'url';
+import 'dotenv/config';
+import { OAuth2Client } from 'google-auth-library';   // ← AGREGADO
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,7 +17,11 @@ const app = express();
 const PORT = 4000;
 
 // OJO: en serio en producción esto debe ir en .env
-const JWT_SECRET = 'donpolloreydelmundoblablablableblebleblublublu';
+const JWT_SECRET = process.env.JWT_SECRET || 'donpolloreydelmundoblablablableblebleblublublu';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";   // ← AGREGADO
+
+// Cliente OAuth de Google
+const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);       // ← AGREGADO
 
 // Middleware
 app.use(cors({
@@ -32,6 +38,7 @@ function leerUsuarios() {
     fs.writeFileSync(USERS_FILE, '[]', 'utf-8');
   }
   const data = fs.readFileSync(USERS_FILE, 'utf-8');
+  if (!data.trim()) return [];
   return JSON.parse(data);
 }
 
@@ -41,18 +48,16 @@ function guardarUsuarios(usuarios) {
 
 // === HELPERS JWT ===
 function generarToken(usuario) {
-  // Solo guardamos info mínima
   const payload = {
     id: usuario.id,
     email: usuario.email,
     nombre: usuario.nombre,
   };
-
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '2h' });
 }
 
 function authMiddleware(req, res, next) {
-  const authHeader = req.headers.authorization; // "Bearer xxx"
+  const authHeader = req.headers.authorization;
   if (!authHeader) {
     return res.status(401).json({ mensaje: 'No se envió token' });
   }
@@ -91,7 +96,6 @@ app.post('/api/auth/register', (req, res) => {
     nombre,
     email,
     passwordHash,
-    // aquí podrías guardar rol, fecha de creación, etc.
   };
 
   usuarios.push(nuevoUsuario);
@@ -137,6 +141,65 @@ app.post('/api/auth/login', (req, res) => {
       email: usuario.email,
     },
   });
+});
+
+// === GOOGLE LOGIN (SSO) ===
+app.post('/api/auth/google', async (req, res) => {
+  try {
+    const { credential } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({ mensaje: 'Falta credential de Google' });
+    }
+
+    // Verificar token de Google
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const email = payload.email;
+    const nombre = payload.name || payload.given_name || "Usuario Google";
+    const googleId = payload.sub;
+
+    if (!email) {
+      return res.status(400).json({ mensaje: 'Google no entregó email válido' });
+    }
+
+    // Buscar usuario o crearlo
+    const usuarios = leerUsuarios();
+    let usuario = usuarios.find(u => u.email === email);
+
+    if (!usuario) {
+      usuario = {
+        id: `google-${googleId}`,
+        email,
+        nombre,
+        passwordHash: null,
+        viaGoogle: true,
+      };
+      usuarios.push(usuario);
+      guardarUsuarios(usuarios);
+    }
+
+    const token = generarToken(usuario);
+
+    return res.json({
+      mensaje: 'Login con Google exitoso',
+      token,
+      usuario: {
+        id: usuario.id,
+        email: usuario.email,
+        nombre: usuario.nombre,
+        viaGoogle: true,
+      },
+    });
+
+  } catch (err) {
+    console.error('Error en /api/auth/google:', err);
+    return res.status(500).json({ mensaje: 'Error validando token con Google' });
+  }
 });
 
 // Ruta protegida de ejemplo
