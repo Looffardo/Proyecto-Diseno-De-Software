@@ -1,5 +1,7 @@
 import { useState, useMemo } from "react";
 import "./styles.css";
+import Auth from "./Auth";
+import { getToken, setToken, apiRequest } from "./ApiClient";
 
 const PLATOS_INICIALES = [
   {
@@ -521,13 +523,29 @@ const handleEditar = (plato) => {
     if (!confirm("¿Seguro que deseas eliminar este plato?")) return;
     setPlatos((prev) => prev.filter((p) => p.id !== id));
   };
-
+const [usuario, setUsuario] = useState(null);
+const handleLogout = () => {
+    setToken(null);
+    setUsuario(null);
+  };
+  if (!usuario && !getToken()) {
+    return <Auth onAuth={setUsuario} />;
+  }
   return (
     <div className="app">
       <header className="header">
         <h1>Restaurante "Nombre Restaurante"</h1>
+        {usuario && (
+          <div>
+            <span style={{ marginRight: "1rem" }}>
+              Hola, {usuario.nombre || usuario.email}
+            </span>
+            <button className="btn secundario" onClick={handleLogout}>
+              Cerrar sesión
+            </button>
+          </div>
+        )}
       </header>
-
       <main className="layout">
         
         {/* Menú + filtros */}
