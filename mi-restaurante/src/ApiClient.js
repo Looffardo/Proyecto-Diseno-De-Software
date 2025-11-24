@@ -12,7 +12,9 @@ export function setToken(token) {
     localStorage.removeItem('token');
   }
 }
-
+export async function obtenerMacros(nombrePlato) {
+  return apiRequest(`/api/nutricion?q=${encodeURIComponent(nombrePlato)}`);
+}
 export async function apiRequest(path, options = {}) {
   const headers = options.headers ? { ...options.headers } : {};
   const token = getToken();

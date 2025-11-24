@@ -20,6 +20,9 @@ const PORT = 4000;
 const JWT_SECRET = process.env.JWT_SECRET || 'donpolloreydelmundoblablablableblebleblublublu';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";   // ← AGREGADO
 
+
+const cacheMacros = {};
+
 // Cliente OAuth de Google
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);       // ← AGREGADO
 
@@ -199,6 +202,67 @@ app.post('/api/auth/google', async (req, res) => {
   } catch (err) {
     console.error('Error en /api/auth/google:', err);
     return res.status(500).json({ mensaje: 'Error validando token con Google' });
+  }
+});
+
+app.get('/api/nutricion', async (req, res) => {
+  try {
+    const query = req.query.q.toLowerCase();
+
+    if (!query) {
+      return res.status(400).json({ mensaje: "Falta el parámetro q" });
+    }
+
+    // Traducciones ES → EN
+    const traducciones = {
+      "camarones apanados": "breaded shrimp",
+      "ostiones a la parmesana": "scallops parmesan",
+      "ensalada césar": "caesar salad",
+      "ensalada caprese": "caprese salad",
+      "crema de zapallo": "pumpkin soup",
+      "locos": "abalone",
+      "falafel": "falafel",
+      "gyosas": "dumplings",
+      "hamburguesa clásica": "beef burger",
+      "barros luco": "beef cheese sandwich",
+      "bistec a lo pobre": "steak with fries",
+      "milanesa de pollo napolitana": "chicken milanesa napolitana",
+      "bagel de salmón ahumado": "smoked salmon bagel",
+    };
+
+    const textoEn = traducciones[query] || query;
+
+    // ---- CACHÉ ----
+    if (cacheMacros[textoEn]) {
+      console.log("CACHE HIT:", textoEn);
+      return res.json(cacheMacros[textoEn]);
+    }
+
+    console.log("API CALL:", textoEn);
+
+    const response = await fetch(
+      `https://api.calorieninjas.com/v1/nutrition?query=${encodeURIComponent(textoEn)}`,
+      {
+        method: "GET",
+        headers: { "X-Api-Key": process.env.CALORIE_NINJAS_KEY },
+        timeout: 15000,
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return res.status(500).json({ mensaje: "Error consultando API externa" });
+    }
+
+    // Guardar en caché
+    cacheMacros[textoEn] = data;
+
+    return res.json(data);
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ mensaje: "Timeout o error de conexión" });
   }
 });
 

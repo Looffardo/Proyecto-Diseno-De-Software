@@ -1,7 +1,11 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import "./styles.css";
 import Auth from "./Auth";
-import { getToken, setToken, apiRequest } from "./ApiClient";
+import { getToken, setToken, apiRequest, obtenerMacros } from "./ApiClient";
+
+
+
+
 
 const PLATOS_INICIALES = [
   {
@@ -523,11 +527,54 @@ const handleEditar = (plato) => {
     if (!confirm("¿Seguro que deseas eliminar este plato?")) return;
     setPlatos((prev) => prev.filter((p) => p.id !== id));
   };
+const verMacros = async (plato) => {
+  try {
+    const data = await obtenerMacros(plato.nombre);
+
+    if (!data.items || data.items.length === 0) {
+      alert("No se encontraron datos nutricionales para este plato.");
+      return;
+    }
+
+    const n = data.items[0];
+
+    alert(
+      `Información nutricional aproximada:\n\n` +
+      `Calorías: ${n.calories}\n` +
+      `Proteína: ${n.protein_g} g\n` +
+      `Grasas totales: ${n.fat_total_g} g\n` +
+      `Carbohidratos: ${n.carbohydrates_total_g} g\n`
+    );
+  } catch (err) {
+    console.error(err);
+    alert("Error al consultar la información nutricional.");
+  }
+};
+
+// === AUTH ===
 const [usuario, setUsuario] = useState(null);
 const handleLogout = () => {
-    setToken(null);
-    setUsuario(null);
-  };
+  setToken(null);
+  setUsuario(null);
+};
+
+// Cargar usuario al montar si ya hay token guardado
+useEffect(() => {
+  const token = getToken();
+  if (!token || usuario) return; // si no hay token o ya tengo usuario, no hago nada
+
+  (async () => {
+    try {
+      const data = await apiRequest("/api/auth/profile");
+      setUsuario(data.usuario);
+    } catch (err) {
+      console.error("No se pudo cargar el perfil, limpiando token", err);
+      setToken(null);
+      setUsuario(null);
+    }
+  })();
+}, [usuario]);
+  // Si no hay usuario logueado, mostrar pantalla de login
   if (!usuario && !getToken()) {
     return <Auth onAuth={setUsuario} />;
   }
@@ -698,6 +745,13 @@ const handleLogout = () => {
                         onClick={() => handleEliminar(plato.id)}
                       >
                         Eliminar
+                      </button>
+                      <button
+                         className="btn secundario"
+                         onClick={() => verMacros(plato)}
+                         style={{ marginTop: "0.3rem" }}
+                      >
+                        Ver macros
                       </button>
                     </div>
                   </article>
