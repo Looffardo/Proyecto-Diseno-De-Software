@@ -17,5 +17,12 @@
     "nombre": "Valen Malov",
     "passwordHash": null,
     "viaGoogle": true
+  },
+  {
+    "id": "google-104180843727000415353",
+    "email": "pablomoralestenis@gmail.com",
+    "nombre": "TJ Gaming",
+    "passwordHash": null,
+    "viaGoogle": true
   }
 ]

@@ -12,9 +12,13 @@ export function setToken(token) {
     localStorage.removeItem('token');
   }
 }
-export async function obtenerMacros(nombrePlato) {
-  return apiRequest(`/api/nutricion?q=${encodeURIComponent(nombrePlato)}`);
+
+// === IA NUTRICIÓN ===
+export async function obtenerIANutricion(nombrePlato) {
+  return apiRequest(`/api/ia-nutricion?q=${encodeURIComponent(nombrePlato)}`);
 }
+
+// === GENÉRICO ===
 export async function apiRequest(path, options = {}) {
   const headers = options.headers ? { ...options.headers } : {};
   const token = getToken();

@@ -11,6 +11,7 @@
     "server": "node server/index.js"
   },
   "dependencies": {
+    "@google/genai": "^1.30.0",
     "@react-oauth/google": "^0.12.2",
     "dotenv": "^17.2.3",
     "google-auth-library": "^10.5.0",

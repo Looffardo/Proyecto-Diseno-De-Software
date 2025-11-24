@@ -5,7 +5,7 @@ import {
   getToken,
   setToken,
   apiRequest,
-  obtenerMacros,
+  obtenerIANutricion,
   obtenerPlatos,
   crearPlato,
   actualizarPlato,
@@ -446,6 +446,12 @@ const [soloAlcohol, setSoloAlcohol] = useState(false);
 const [soloCarnes, setSoloCarnes] = useState(false);
 const [soloSandwitches, setSoloSandwitches] = useState(false);
 
+const [modalAbierto, setModalAbierto] = useState(false);
+const [macroData, setMacroData] = useState(null);
+const [cargandoMacros, setCargandoMacros] = useState(false);  // ← NUEVO
+
+
+
 const [editando, setEditando] = useState(null);
 const [form, setForm] = useState({
   nombre: "",
@@ -631,27 +637,20 @@ const handleEliminar = async (id) => {
 
 const verMacros = async (plato) => {
   try {
-    const data = await obtenerMacros(plato.nombre);
+    setCargandoMacros(true);
+    setMacroData(null); // opcional, por si quieres limpiar lo anterior
 
-    if (!data.items || data.items.length === 0) {
-      alert("No se encontraron datos nutricionales para este plato.");
-      return;
-    }
-
-    const n = data.items[0];
-
-    alert(
-      `Información nutricional aproximada:\n\n` +
-      `Calorías: ${n.calories}\n` +
-      `Proteína: ${n.protein_g} g\n` +
-      `Grasas totales: ${n.fat_total_g} g\n` +
-      `Carbohidratos: ${n.carbohydrates_total_g} g\n`
-    );
+    const data = await obtenerIANutricion(plato.nombre);
+    setMacroData(data);
+    setModalAbierto(true);
   } catch (err) {
     console.error(err);
-    alert("Error al consultar la información nutricional.");
+    alert("Error obteniendo información nutricional.");
+  } finally {
+    setCargandoMacros(false);
   }
 };
+
 
 // === AUTH ===
 const [usuario, setUsuario] = useState(null);
@@ -852,11 +851,12 @@ useEffect(() => {
                         Eliminar
                       </button>
                       <button
-                         className="btn secundario"
-                         onClick={() => verMacros(plato)}
-                         style={{ marginTop: "0.3rem" }}
+                        className="btn secundario"
+                        onClick={() => verMacros(plato)}
+                        style={{ marginTop: "0.3rem" }}
+                        disabled={cargandoMacros}
                       >
-                        Ver macros
+                        {cargandoMacros ? "Cargando..." : "Ver macros"}
                       </button>
                     </div>
                   </article>
@@ -1045,6 +1045,50 @@ useEffect(() => {
           </div>
         </section>
       </main>
+          {modalAbierto && macroData && (
+  <div className="modal-fondo" onClick={() => setModalAbierto(false)}>
+    <div className="modal" onClick={(e) => e.stopPropagation()}>
+      <h2>Información nutricional</h2>
+
+      <p><strong>Plato:</strong> {macroData.nombre_original}</p>
+      <p><strong>Traducción IA:</strong> {macroData.traduccion}</p>
+
+      <h3>Totales</h3>
+      <div className="macro-totales">
+        <p><strong>Calorías:</strong> {macroData.total.calories} kcal</p>
+        <p><strong>Proteína:</strong> {macroData.total.protein_g} g</p>
+        <p><strong>Grasas:</strong> {macroData.total.fat_g} g</p>
+        <p><strong>Carbohidratos:</strong> {macroData.total.carbs_g} g</p>
+      </div>
+
+      <h3>Ingredientes analizados</h3>
+      <ul className="ingredientes-macro">
+        {macroData.ingredientes.map((i, idx) => (
+          <li key={idx}>
+            <strong>{i.name}</strong> — {i.weight_g}g  
+            <br />
+            {i.calories.toFixed(0)} kcal · {i.protein_g.toFixed(1)}g prot · {i.fat_g.toFixed(1)}g grasa · {i.carbs_g.toFixed(1)}g carb
+          </li>
+        ))}
+      </ul>
+
+      <button className="btn cerrar-modal" onClick={() => setModalAbierto(false)}>
+        Cerrar
+      </button>
+    </div>
+  </div>
+)}  
+
+          {cargandoMacros && !modalAbierto && (
+            <div className="modal-fondo">
+              <div className="modal modal-loading" onClick={(e) => e.stopPropagation()}>
+                <div className="spinner" />
+                <p>Cargando información nutricional...</p>
+              </div>
+            </div>
+          )}
+
+
     </div>
   );
 }
