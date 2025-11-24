@@ -1,5 +1,5 @@
 const express = require("express");
-const Plato = require("../models/Plato");
+const Plato = require("../modelos/Plato");
 
 const router = express.Router();
 
