@@ -1,7 +1,18 @@
 import { useState, useMemo, useEffect } from "react";
 import "./styles.css";
 import Auth from "./Auth";
-import { getToken, setToken, apiRequest, obtenerMacros } from "./ApiClient";
+import {
+  getToken,
+  setToken,
+  apiRequest,
+  obtenerMacros,
+  obtenerPlatos,
+  crearPlato,
+  actualizarPlato,
+  eliminarPlato,
+  crearPedido,
+} from "./ApiClient";
+
 
 
 
@@ -369,7 +380,7 @@ const PLATOS_INICIALES = [
     ingredientes: ["Milanesa de pollo", "Tomate", "Queso", "Jamón", "Papas fritas"],
   },
   {
-    id: "",
+    id: "25",
     nombre: "Tiramisú",
     descripcion: "Postre frío clásico italiano.",
     precio: 5500,
@@ -383,11 +394,47 @@ const PLATOS_INICIALES = [
     esSandwitch: false,
     ingredientes: ["Bizcotelas", "Café", "Queso mascarpone", "Cacao en polvo"],
   },
+  {
+    id: "26",
+    nombre: "Cheesecake de frutos rojos",
+    descripcion: "Porcion de cheesecake con base de galleta y cobertura de frutos rojos.",
+    precio: 5500,
+    tipo: "postre",
+    esFrio: true,
+    esVegano: false,
+    esPasta: false,
+    esMarisco: false,
+    esAlcohol: false,
+    esCarne: false,
+    esSandwitch: false,
+    ingredientes: ["Queso crema", "Galletas", "Mantequilla", "Frutos rojos", "Leche condensada"],
+  },
+
 ];
 
 
+
 function App() {
-const [platos, setPlatos] = useState(PLATOS_INICIALES);
+const [platos, setPlatos] = useState([]);
+const [cargandoPlatos, setCargandoPlatos] = useState(true);
+const [errorPlatos, setErrorPlatos] = useState(null);
+
+useEffect(() => {
+  async function fetchPlatos() {
+    try {
+      const data = await obtenerPlatos();
+      setPlatos(data);
+    } catch (err) {
+      console.error(err);
+      setErrorPlatos("No se pudieron cargar los platos.");
+    } finally {
+      setCargandoPlatos(false);
+    }
+  }
+
+  fetchPlatos();
+}, []);
+
 
 const [busqueda, setBusqueda] = useState("");
 const [tipo, setTipo] = useState("todos");
@@ -426,6 +473,36 @@ const [pedido, setPedido] = useState([]);
     () => pedido.reduce((acc, p) => acc + p.precio, 0),
     [pedido]
   );
+
+  const confirmarPedido = async () => {
+  if (pedido.length === 0) {
+    alert("No hay platos en el pedido.");
+    return;
+  }
+
+  const items = pedido.map((p) => ({
+    platoId: p.id || p._id,
+    nombre: p.nombre,
+    precioUnitario: p.precio,
+    cantidad: 1, // si más adelante manejas cantidades, cámbialo
+  }));
+
+  const payload = {
+    items,
+    total: totalPedido,
+    // opcional: usuarioId: usuario?.id || usuario?._id,
+  };
+
+  try {
+    await crearPedido(payload);
+    alert("Pedido guardado en la base de datos.");
+    setPedido([]);
+  } catch (err) {
+    console.error(err);
+    alert("Error al guardar el pedido.");
+  }
+};
+
 
   const platosFiltrados = useMemo(() => {
     return platos.filter((plato) => {
@@ -471,7 +548,7 @@ const [pedido, setPedido] = useState([]);
     });
   };
 
-const handleSubmit = (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
 
   const precioNum = Number(form.precio);
@@ -485,25 +562,42 @@ const handleSubmit = (e) => {
     .map((s) => s.trim())
     .filter((s) => s.length > 0);
 
-  if (editando) {
-    setPlatos((prev) =>
-      prev.map((p) =>
-        p.id === editando
-          ? { ...p, ...form, precio: precioNum, ingredientes: ingredientesArray }
-          : p
-      )
-    );
-  } else {
-    const nuevo = {
-      ...form,
-      id: crypto.randomUUID(),
-      precio: precioNum,
-      ingredientes: ingredientesArray,
-    };
-    setPlatos((prev) => [...prev, nuevo]);
-  }
+  const payload = {
+    nombre: form.nombre,
+    descripcion: form.descripcion,
+    precio: precioNum,
+    tipo: form.tipo,
+    esFrio: form.esFrio,
+    esVegano: form.esVegano,
+    esPasta: form.esPasta,
+    esMarisco: form.esMarisco,
+    esAlcohol: form.esAlcohol,
+    esCarne: form.esCarne,
+    esSandwitch: form.esSandwitch,
+    ingredientes: ingredientesArray,
+  };
+
+  try {
+    if (editando) {
+      // EDITAR
+      const actualizado = await actualizarPlato(editando, payload);
+
+      setPlatos((prev) =>
+        prev.map((p) => (p.id === editando || p._id === editando ? actualizado : p))
+      );
+    } else {
+      // CREAR
+      const creado = await crearPlato(payload);
+      setPlatos((prev) => [...prev, creado]);
+    }
+
     limpiarFormulario();
+  } catch (err) {
+    console.error(err);
+    alert("Error al guardar el plato");
+  }
 };
+
 
 const handleEditar = (plato) => {
   setEditando(plato.id);
@@ -523,10 +617,18 @@ const handleEditar = (plato) => {
   });
 };
 
-  const handleEliminar = (id) => {
-    if (!confirm("¿Seguro que deseas eliminar este plato?")) return;
-    setPlatos((prev) => prev.filter((p) => p.id !== id));
-  };
+const handleEliminar = async (id) => {
+  if (!confirm("¿Seguro que deseas eliminar este plato?")) return;
+
+  try {
+    await eliminarPlato(id);
+    setPlatos((prev) => prev.filter((p) => p.id !== id && p._id !== id));
+  } catch (err) {
+    console.error(err);
+    alert("Error al eliminar el plato");
+  }
+};
+
 const verMacros = async (plato) => {
   try {
     const data = await obtenerMacros(plato.nombre);
@@ -689,7 +791,10 @@ useEffect(() => {
           <div className="card">
             <h2>Menú</h2>
 
-            {platosFiltrados.length === 0 && (
+            {cargandoPlatos && <p>Cargando platos...</p>}
+            {errorPlatos && <p style={{ color: "red" }}>{errorPlatos}</p>}
+
+            {!cargandoPlatos && platosFiltrados.length === 0 && (
               <p>No se encontraron platos con esos filtros.</p>
             )}
 
@@ -931,6 +1036,10 @@ useEffect(() => {
                 <p className="total">
                   Total: ${totalPedido.toLocaleString("es-CL")}
                 </p>
+
+                <button className="btn" type="button" onClick={confirmarPedido}>
+                  Confirmar pedido
+                </button>
               </>
             )}
           </div>

@@ -45,3 +45,36 @@ export async function apiRequest(path, options = {}) {
 
   return data;
 }
+
+// PLATOS
+export async function obtenerPlatos() {
+  return apiRequest('/api/platos');
+}
+
+export async function crearPlato(plato) {
+  return apiRequest('/api/platos', {
+    method: 'POST',
+    body: plato,
+  });
+}
+
+export async function actualizarPlato(id, plato) {
+  return apiRequest(`/api/platos/${id}`, {
+    method: 'PUT',
+    body: plato,
+  });
+}
+
+export async function eliminarPlato(id) {
+  return apiRequest(`/api/platos/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+// PEDIDOS
+export async function crearPedido(pedido) {
+  return apiRequest('/api/pedidos', {
+    method: 'POST',
+    body: pedido,
+  });
+}
