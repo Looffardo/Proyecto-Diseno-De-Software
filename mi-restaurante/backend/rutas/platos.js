@@ -21,8 +21,8 @@ router.post("/", async (req, res) => {
     const guardado = await plato.save();
     res.status(201).json(guardado);
   } catch (err) {
-    console.error(err);
-    res.status(400).json({ mensaje: "Error al crear el plato" });
+    console.error("Error al crear el plato", err.message);
+    res.status(400).json({ mensaje: "Error al crear el plato", detalle: err.message });
   }
 });
 

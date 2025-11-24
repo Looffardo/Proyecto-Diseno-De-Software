@@ -528,6 +528,7 @@ const [pedido, setPedido] = useState([]);
       return true;
     });
   }, [platos, busqueda, tipo, soloFríos, soloVeganos, soloPastas, soloMariscos, soloAlcohol, soloCarnes, soloSandwitches]);
+
   const handleChangeForm = (e) => {
     const { name, value, type, checked } = e.target;
     setForm((f) => ({
@@ -606,7 +607,8 @@ const handleSubmit = async (e) => {
 
 
 const handleEditar = (plato) => {
-  setEditando(plato.id);
+  const platoId = plato.id || plato._id;
+  setEditando(platoId);
   setForm({
     nombre: plato.nombre,
     descripcion: plato.descripcion,
@@ -622,6 +624,7 @@ const handleEditar = (plato) => {
     ingredientesTexto: plato.ingredientes?.join(", ") || "",
   });
 };
+
 
 const handleEliminar = async (id) => {
   if (!confirm("¿Seguro que deseas eliminar este plato?")) return;
@@ -799,14 +802,15 @@ useEffect(() => {
 
             <div className="lista-platos">
               {platosFiltrados.map((plato) => {
-                const abierto = platoActivoId === plato.id;
+                const platoId = plato.id || plato._id;
+                const abierto = platoActivoId === platoId;
 
                 return (
                   <article
-                    key={plato.id}
+                    key={platoId}
                     className={`plato ${abierto ? "plato-abierto" : ""}`}
                     onClick={() =>
-                      setPlatoActivoId((prev) => (prev === plato.id ? null : plato.id))
+                      setPlatoActivoId((prev) => (prev === platoId ? null : platoId))
                     }
                   >
                     <div className="plato-contenido">
@@ -828,7 +832,6 @@ useEffect(() => {
                       )}
                     </div>
 
-                    {/* Botones: evitamos que el click colapse/abra al usar stopPropagation */}
                     <div
                       className="acciones-plato"
                       onClick={(e) => e.stopPropagation()}
@@ -846,10 +849,11 @@ useEffect(() => {
 
                       <button
                         className="btn peligro"
-                        onClick={() => handleEliminar(plato.id)}
+                        onClick={() => handleEliminar(platoId)}
                       >
                         Eliminar
                       </button>
+
                       <button
                         className="btn secundario"
                         onClick={() => verMacros(plato)}
@@ -862,6 +866,7 @@ useEffect(() => {
                   </article>
                 );
               })}
+
             </div>
 
           </div>
