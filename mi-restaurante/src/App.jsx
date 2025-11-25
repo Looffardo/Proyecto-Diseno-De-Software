@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import "./styles.css";
 import Auth from "./Auth";
-import { useI18n } from "./i18n/I18nProvider";
 import {
   getToken,
   setToken,
@@ -310,12 +309,13 @@ const PLATOS_INICIALES = [
 ];
 
 
-
+//Logica central de la app
 function App() {
+
+
 const [platos, setPlatos] = useState([]);
 const [cargandoPlatos, setCargandoPlatos] = useState(true);
 const [errorPlatos, setErrorPlatos] = useState(null);
-const { lang, setLang, t } = useI18n();
 
 useEffect(() => {
   async function fetchPlatos() {
@@ -576,48 +576,31 @@ useEffect(() => {
     }
   })();
 }, [usuario]);
-    // Si no hay usuario logueado, mostrar pantalla de login
+  // Si no hay usuario logueado, mostrar pantalla de login
   if (!usuario && !getToken()) {
     return <Auth onAuth={setUsuario} />;
   }
   return (
     <div className="app">
       <header className="header">
-        <h1>{t("layout.appTitle")}</h1>
-
-        <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-          <label className="selector-idioma">
-            {t("layout.languageLabel")}{" "}
-            <select
-              value={lang}
-              onChange={(e) => setLang(e.target.value)}
-            >
-              <option value="es">{t("layout.spanish")}</option>
-              <option value="en">{t("layout.english")}</option>
-            </select>
-          </label>
-
-          {usuario && (
-            <div>
-              <span style={{ marginRight: "1rem" }}>
-                {t("app.welcomeUser", {
-                  name: usuario.nombre || usuario.email,
-                })}
-              </span>
-              <button className="btn secundario" onClick={handleLogout}>
-                {t("app.logout")}
-              </button>
-            </div>
-          )}
-        </div>
+        <h1>Restaurante "Nombre Restaurante"</h1>
+        {usuario && (
+          <div>
+            <span style={{ marginRight: "1rem" }}>
+              Hola, {usuario.nombre || usuario.email}
+            </span>
+            <button className="btn secundario" onClick={handleLogout}>
+              Cerrar sesión
+            </button>
+          </div>
+        )}
       </header>
-
       <main className="layout">
         
         {/* Menú + filtros */}
         <section className="col principal">
           <div className="card filtros">
-            <h2>{t("app.filtersTitle")}</h2>
+            <h2>Buscar y filtrar</h2>
             <input
               type="text"
               placeholder="Buscar plato..."
@@ -706,7 +689,7 @@ useEffect(() => {
           </div>
 
           <div className="card">
-            <h2>{t("app.menuTitle")}</h2>
+            <h2>Menú</h2>
 
             {cargandoPlatos && <p>Cargando platos...</p>}
             {errorPlatos && <p style={{ color: "red" }}>{errorPlatos}</p>}
@@ -939,22 +922,29 @@ useEffect(() => {
           </div>
 
           <div className="card">
-            <h2>{t("app.orderSectionTitle")}</h2>
-              {pedido.length === 0 ? (
-                <p>No has agregado nada al pedido.</p> 
-              ) : (
-                <>
-                  ...
-                  <p className="total">
-                    {t("app.totalLabel")}: ${totalPedido.toLocaleString("es-CL")}
-                  </p>
+            <h2>Pedido</h2>
 
-                  <button className="btn" type="button" onClick={confirmarPedido}>
-                    {t("app.confirmOrder")}
-                  </button>
-                </>
-              )}
-            
+            {pedido.length === 0 ? (
+              <p>No has agregado nada al pedido.</p>
+            ) : (
+              <>
+                <ul className="lista-pedido">
+                  {pedido.map((p, i) => (
+                    <li key={i}>
+                      {p.nombre} — ${p.precio.toLocaleString("es-CL")}
+                    </li>
+                  ))}
+                </ul>
+
+                <p className="total">
+                  Total: ${totalPedido.toLocaleString("es-CL")}
+                </p>
+
+                <button className="btn" type="button" onClick={confirmarPedido}>
+                  Confirmar pedido
+                </button>
+              </>
+            )}
           </div>
         </section>
       </main>
