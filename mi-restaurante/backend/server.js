@@ -325,9 +325,11 @@ app.get("/api/nutricion", async (req, res) => {
 app.get("/api/ia-nutricion", async (req, res) => {
   try {
     const plato = req.query.q;
-    if (!plato)
+    if (!plato) {
       return res.status(400).json({ mensaje: "Falta parámetro q" });
+    }
 
+    // ---------- CACHE IA: si ya lo calculamos antes ----------
     if (cacheIA[plato]) {
       console.log("CACHE IA HIT:", plato);
       return res.json(cacheIA[plato]);
@@ -335,55 +337,130 @@ app.get("/api/ia-nutricion", async (req, res) => {
 
     console.log("IA CALL:", plato);
 
+    // ---------- 1) PEDIR A GEMINI INGREDIENTES + GRAMOS ----------
     const prompt = `
-Eres un experto en nutrición culinaria.
-Devuelve SOLO JSON válido con:
+Eres nutricionista y chef. Dado el nombre de un plato en ESPAÑOL,
+inventa una lista razonable de ingredientes con cantidades estimadas en gramos.
+
+Responde SOLO con JSON válido, sin texto extra ni comentarios, con ESTE formato EXACTO:
 
 {
-  "english_name": "",
-  "estimated_total_weight_g": 0,
+  "english_name": "traducción corta del nombre del plato al inglés",
   "ingredients": [
-    { "name_en": "", "estimated_weight_g": 0 }
+    { "name_en": "ingredient name (en inglés)", "estimated_weight_g": 120 },
+    { "name_en": "otro ingrediente", "estimated_weight_g": 50 }
   ]
 }
+
+Reglas:
+- Usa entre 3 y 10 ingredientes.
+- "estimated_weight_g" siempre debe ser un número entre 5 y 1000.
+- No incluyas texto fuera del JSON.
 
 Plato: "${plato}"
 `;
 
-    // 📌 LOG ANTES DE LLAMAR A GEMINI
-    console.log("Llamando a Gemini con prompt...");
-
     const ia = await usarGeminiComoJSON(prompt);
 
-    // 📌 LOG DE RESPUESTA
-    console.log("Respuesta IA (primeros 300 chars):", JSON.stringify(ia).slice(0, 300));
+    // Si la IA falló o no devolvió bien el objeto, hacemos fallback
+    if (
+      !ia ||
+      typeof ia !== "object" ||
+      !Array.isArray(ia.ingredients) ||
+      ia.ingredients.length === 0
+    ) {
+      console.error("IA no entregó ingredientes válidos. Objeto recibido:", ia);
 
-    if (!ia || typeof ia !== "object") {
-      return res.status(500).json({ mensaje: "La IA no entregó un objeto válido" });
+      // Fallback: usamos solo el nombre traducido aproximado
+      const traducciones = {
+        "camarones apanados": "breaded shrimp",
+        "ostiones a la parmesana": "scallops parmesan",
+        "ensalada césar": "caesar salad",
+        "ensalada caprese": "caprese salad",
+        "crema de zapallo": "pumpkin soup",
+        locos: "abalone",
+        falafel: "falafel",
+        gyosas: "dumplings",
+        "hamburguesa clásica": "beef burger",
+        "barros luco": "beef cheese sandwich",
+        "bistec a lo pobre": "steak with fries",
+        "milanesa de pollo napolitana": "chicken milanesa napolitana",
+        "bagel de salmón ahumado": "smoked salmon bagel",
+      };
+
+      const key = plato.toLowerCase();
+      const englishName = traducciones[key] || plato;
+
+      // Llamamos a CalorieNinjas una sola vez para el plato completo
+      const resp = await fetch(
+        `https://api.calorieninjas.com/v1/nutrition?query=${encodeURIComponent(
+          englishName
+        )}`,
+        {
+          headers: { "X-Api-Key": CALORIE_NINJAS_KEY },
+        }
+      );
+
+      if (!resp.ok) {
+        console.error("CalorieNinjas ERROR (fallback):", resp.status);
+        return res
+          .status(500)
+          .json({ mensaje: "Error en IA Nutrición (fallback)" });
+      }
+
+      const data = await resp.json();
+      if (!data.items || data.items.length === 0) {
+        return res
+          .status(500)
+          .json({ mensaje: "CalorieNinjas no entregó resultados" });
+      }
+
+      const item = data.items[0];
+      const weight = item.serving_size_g || 100;
+
+      const ingrediente = {
+        name: englishName,
+        weight_g: weight,
+        calories: item.calories || 0,
+        protein_g: item.protein_g || 0,
+        fat_g: item.fat_total_g || 0,
+        carbs_g: item.carbohydrates_total_g || 0,
+      };
+
+      const total = {
+        calories: Math.round(ingrediente.calories),
+        protein_g: Number(ingrediente.protein_g.toFixed(1)),
+        fat_g: Number(ingrediente.fat_g.toFixed(1)),
+        carbs_g: Number(ingrediente.carbs_g.toFixed(1)),
+      };
+
+      const resultadoFallback = {
+        nombre_original: plato,
+        traduccion: englishName,
+        ingredientes: [ingrediente],
+        total,
+      };
+
+      cacheIA[plato] = resultadoFallback;
+      return res.json(resultadoFallback);
     }
 
-    if (!Array.isArray(ia.ingredients) || ia.ingredients.length === 0) {
-      return res.status(500).json({
-        mensaje: "La IA no entregó ingredientes válidos",
-        detalle: ia,
-      });
-    }
+    // ---------- 2) TENEMOS INGREDIENTES + GRAMOS DE GEMINI ----------
+    const englishName = ia.english_name || plato;
+    const ingredientesGemini = ia.ingredients;
 
     const resultados = [];
     const total = { calories: 0, protein_g: 0, fat_g: 0, carbs_g: 0 };
 
-    for (const ing of ia.ingredients) {
-      if (!ing || !ing.name_en || !ing.estimated_weight_g) {
-        continue;
-      }
+    for (const ing of ingredientesGemini) {
+      if (!ing || !ing.name_en || !ing.estimated_weight_g) continue;
 
-      const nombreIng = ing.name_en.toLowerCase();
-      const peso = ing.estimated_weight_g;
+      const nombreIng = String(ing.name_en).toLowerCase();
+      const peso = Number(ing.estimated_weight_g);
 
-      // 📌 LOG ANTES DE LLAMAR A NINJAS
-      console.log("Buscando macros en CalorieNinjas para:", nombreIng);
+      if (!peso || peso <= 0) continue;
 
-      // Cache ingrediente
+      // ---------- 2.1) Obtener macros base (por porción) de CalorieNinjas ----------
       if (!cacheMacrosIng[nombreIng]) {
         const resp = await fetch(
           `https://api.calorieninjas.com/v1/nutrition?query=${encodeURIComponent(
@@ -394,28 +471,30 @@ Plato: "${plato}"
           }
         );
 
-        // 📌 LOG STATUS DE RESPUESTA
-        console.log("CalorieNinjas status:", resp.status);
-
-        const data = await resp.json();
-
-        // 📌 LOG RESPUESTA PARCIAL
-        console.log("Respuesta CalorieNinjas:", JSON.stringify(data).slice(0, 200));
-
-        if (!data.items || data.items.length === 0) {
+        if (!resp.ok) {
+          console.error("CalorieNinjas ERROR ing:", nombreIng, resp.status);
           cacheMacrosIng[nombreIng] = null;
         } else {
-          const base = data.items[0];
-          cacheMacrosIng[nombreIng] = {
-            calories: base.calories || 0,
-            protein_g: base.protein_g || 0,
-            fat_g: base.fat_total_g || 0,
-            carbs_g: base.carbohydrates_total_g || 0,
-          };
+          const data = await resp.json();
+
+          if (!data.items || data.items.length === 0) {
+            cacheMacrosIng[nombreIng] = null;
+          } else {
+            const base = data.items[0];
+            cacheMacrosIng[nombreIng] = {
+              serving_g: base.serving_size_g || 100,
+              calories: base.calories || 0,
+              protein_g: base.protein_g || 0,
+              fat_g: base.fat_total_g || 0,
+              carbs_g: base.carbohydrates_total_g || 0,
+            };
+          }
         }
       }
 
       const base = cacheMacrosIng[nombreIng];
+
+      // Si no tenemos datos de macros para este ingrediente, lo agregamos con 0s
       if (!base) {
         resultados.push({
           name: ing.name_en,
@@ -428,26 +507,39 @@ Plato: "${plato}"
         continue;
       }
 
-      const factor = peso / 100;
+      // ---------- 2.2) Escalar macros según el peso estimado ----------
+      const factor = peso / base.serving_g;
+
+      const cals = base.calories * factor;
+      const prot = base.protein_g * factor;
+      const fat = base.fat_g * factor;
+      const carbs = base.carbs_g * factor;
 
       resultados.push({
         name: ing.name_en,
         weight_g: peso,
-        calories: base.calories * factor,
-        protein_g: base.protein_g * factor,
-        fat_g: base.fat_g * factor,
-        carbs_g: base.carbs_g * factor,
+        calories: cals,
+        protein_g: prot,
+        fat_g: fat,
+        carbs_g: carbs,
       });
 
-      total.calories += base.calories * factor;
-      total.protein_g += base.protein_g * factor;
-      total.fat_g += base.fat_g * factor;
-      total.carbs_g += base.carbs_g * factor;
+      total.calories += cals;
+      total.protein_g += prot;
+      total.fat_g += fat;
+      total.carbs_g += carbs;
+    }
+
+    // Si por alguna razón no quedó ningún ingrediente, devolvemos error controlado
+    if (resultados.length === 0) {
+      return res
+        .status(500)
+        .json({ mensaje: "La IA no entregó ingredientes utilizables" });
     }
 
     const final = {
       nombre_original: plato,
-      traduccion: ia.english_name,
+      traduccion: englishName,
       ingredientes: resultados,
       total: {
         calories: Math.round(total.calories),
@@ -459,20 +551,12 @@ Plato: "${plato}"
 
     cacheIA[plato] = final;
     return res.json(final);
-
   } catch (err) {
-    console.error("🔥 ERROR EN IA NUTRICIÓN >>>");
-    console.error("Mensaje:", err?.message);
-    console.error("Stack:", err?.stack);
-    console.error("Detalles respuesta API:", err?.response?.data);
-
-    return res.status(500).json({
-      mensaje: "Error en IA Nutrición",
-      detalle: err?.message,
-      apiResponse: err?.response?.data || null,
-    });
+    console.error("Error en IA Nutrición:", err);
+    return res.status(500).json({ mensaje: "Error en IA Nutrición" });
   }
 });
+
 
 
 
