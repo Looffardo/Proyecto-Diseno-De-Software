@@ -12,6 +12,11 @@ const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
 const { GoogleGenAI } = require("@google/genai");
 
+
+const fetch =
+  global.fetch ||
+  ((...args) =>
+    import("node-fetch").then(({ default: fetch }) => fetch(...args)));
 // ================================================================
 // ===================== CONFIGURACIÓN BASE ========================
 // ================================================================
@@ -102,35 +107,62 @@ function authMiddleware(req, res, next) {
 // ================================================================
 // ================== HELPER: Gemini → JSON ========================
 // ================================================================
-async function usarGeminiComoJSON(prompt) {
-  // Si tu SDK soporta getGenerativeModel:
+async function usarGeminiComoJSON(nombrePlato) {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error("GEMINI_API_KEY no configurada en el servidor");
+  }
+
   const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+  const prompt = `
+Eres un nutricionista experto. Te daré el nombre de un plato en español.
+Debes estimar los ingredientes principales y un peso aproximado en gramos.
+
+RESPONDE SOLO con un JSON VÁLIDO, sin texto adicional, sin comentarios.
+Empieza exactamente con "{" y termina exactamente con "}".
+
+Estructura obligatoria:
+
+{
+  "english_name": "nombre del plato en inglés",
+  "estimated_total_weight_g": 0,
+  "ingredients": [
+    { "name_en": "ingredient name in english", "estimated_weight_g": 0 }
+  ]
+}
+
+- "estimated_total_weight_g" es el peso total aproximado del plato (en gramos).
+- Cada "estimated_weight_g" también es en gramos.
+- Los pesos deben ser números (no strings).
+- Los ingredientes deben ser los más representativos (3 a 8 máximo).
+
+Plato: "${nombrePlato}"
+`;
+
   const result = await model.generateContent(prompt);
 
-  // En muchos SDKs viene como result.response.text()
   const rawText = result.response?.text
     ? result.response.text()
-    : (typeof result.text === "function" ? result.text() : String(result.text || ""));
+    : String(result.response || "");
 
   let text = String(rawText).trim();
 
-  // Limpiar bloques ```json ... ```
+  // Limpia posible bloque ```json ... ```
   if (text.startsWith("```")) {
     text = text
       .replace(/^```json/i, "")
-      .replace(/^```/, "")
-      .replace(/```$/, "")
+      .replace(/^```/i, "")
+      .replace(/```$/i, "")
       .trim();
   }
 
   try {
     return JSON.parse(text);
   } catch (e) {
-    console.error("Error parseando JSON de Gemini:", text);
-    throw new Error("La IA no devolvió JSON válido");
+    console.error("Error parseando JSON de Gemini. Texto recibido:\n", text);
+    throw new Error("IA_JSON_INVALIDO");
   }
 }
-
 
 // ================================================================
 // ======================== RUTAS AUTENTICACIÓN ====================
@@ -320,16 +352,22 @@ app.get("/api/nutricion", async (req, res) => {
 });
 
 // ================================================================
-// =========================== IA NUTRICIÓN =========================
+// =========================== IA NUTRICIÓN ========================
 // ================================================================
 app.get("/api/ia-nutricion", async (req, res) => {
   try {
-    const plato = req.query.q;
+    const plato = (req.query.q || "").trim();
     if (!plato) {
       return res.status(400).json({ mensaje: "Falta parámetro q" });
     }
 
-    // ---------- CACHE IA: si ya lo calculamos antes ----------
+    if (!CALORIE_NINJAS_KEY) {
+      return res
+        .status(500)
+        .json({ mensaje: "CALORIE_NINJAS_KEY no configurada" });
+    }
+
+    // 0) Cache por plato
     if (cacheIA[plato]) {
       console.log("CACHE IA HIT:", plato);
       return res.json(cacheIA[plato]);
@@ -337,134 +375,49 @@ app.get("/api/ia-nutricion", async (req, res) => {
 
     console.log("IA CALL:", plato);
 
-    // ---------- 1) PEDIR A GEMINI INGREDIENTES + GRAMOS ----------
-    const prompt = `
-Eres nutricionista y chef. Dado el nombre de un plato en ESPAÑOL,
-inventa una lista razonable de ingredientes con cantidades estimadas en gramos.
+    // 1) Pedir a Gemini la descomposición del plato
+    const ia = await usarGeminiComoJSON(plato);
 
-Responde SOLO con JSON válido, sin texto extra ni comentarios, con ESTE formato EXACTO:
-
-{
-  "english_name": "traducción corta del nombre del plato al inglés",
-  "ingredients": [
-    { "name_en": "ingredient name (en inglés)", "estimated_weight_g": 120 },
-    { "name_en": "otro ingrediente", "estimated_weight_g": 50 }
-  ]
-}
-
-Reglas:
-- Usa entre 3 y 10 ingredientes.
-- "estimated_weight_g" siempre debe ser un número entre 5 y 1000.
-- No incluyas texto fuera del JSON.
-
-Plato: "${plato}"
-`;
-
-    const ia = await usarGeminiComoJSON(prompt);
-
-    // Si la IA falló o no devolvió bien el objeto, hacemos fallback
-    if (
-      !ia ||
-      typeof ia !== "object" ||
-      !Array.isArray(ia.ingredients) ||
-      ia.ingredients.length === 0
-    ) {
-      console.error("IA no entregó ingredientes válidos. Objeto recibido:", ia);
-
-      // Fallback: usamos solo el nombre traducido aproximado
-      const traducciones = {
-        "camarones apanados": "breaded shrimp",
-        "ostiones a la parmesana": "scallops parmesan",
-        "ensalada césar": "caesar salad",
-        "ensalada caprese": "caprese salad",
-        "crema de zapallo": "pumpkin soup",
-        locos: "abalone",
-        falafel: "falafel",
-        gyosas: "dumplings",
-        "hamburguesa clásica": "beef burger",
-        "barros luco": "beef cheese sandwich",
-        "bistec a lo pobre": "steak with fries",
-        "milanesa de pollo napolitana": "chicken milanesa napolitana",
-        "bagel de salmón ahumado": "smoked salmon bagel",
-      };
-
-      const key = plato.toLowerCase();
-      const englishName = traducciones[key] || plato;
-
-      // Llamamos a CalorieNinjas una sola vez para el plato completo
-      const resp = await fetch(
-        `https://api.calorieninjas.com/v1/nutrition?query=${encodeURIComponent(
-          englishName
-        )}`,
-        {
-          headers: { "X-Api-Key": CALORIE_NINJAS_KEY },
-        }
-      );
-
-      if (!resp.ok) {
-        console.error("CalorieNinjas ERROR (fallback):", resp.status);
-        return res
-          .status(500)
-          .json({ mensaje: "Error en IA Nutrición (fallback)" });
-      }
-
-      const data = await resp.json();
-      if (!data.items || data.items.length === 0) {
-        return res
-          .status(500)
-          .json({ mensaje: "CalorieNinjas no entregó resultados" });
-      }
-
-      const item = data.items[0];
-      const weight = item.serving_size_g || 100;
-
-      const ingrediente = {
-        name: englishName,
-        weight_g: weight,
-        calories: item.calories || 0,
-        protein_g: item.protein_g || 0,
-        fat_g: item.fat_total_g || 0,
-        carbs_g: item.carbohydrates_total_g || 0,
-      };
-
-      const total = {
-        calories: Math.round(ingrediente.calories),
-        protein_g: Number(ingrediente.protein_g.toFixed(1)),
-        fat_g: Number(ingrediente.fat_g.toFixed(1)),
-        carbs_g: Number(ingrediente.carbs_g.toFixed(1)),
-      };
-
-      const resultadoFallback = {
-        nombre_original: plato,
-        traduccion: englishName,
-        ingredientes: [ingrediente],
-        total,
-      };
-
-      cacheIA[plato] = resultadoFallback;
-      return res.json(resultadoFallback);
+    if (!ia || typeof ia !== "object") {
+      return res
+        .status(500)
+        .json({ mensaje: "La IA no entregó un objeto válido" });
     }
 
-    // ---------- 2) TENEMOS INGREDIENTES + GRAMOS DE GEMINI ----------
-    const englishName = ia.english_name || plato;
-    const ingredientesGemini = ia.ingredients;
+    const ingredientesGemini = Array.isArray(ia.ingredients)
+      ? ia.ingredients
+      : [];
 
+    if (ingredientesGemini.length === 0) {
+      return res.status(500).json({
+        mensaje: "La IA no entregó ingredientes válidos",
+        detalle: ia,
+      });
+    }
+
+    // 2) Consultar CalorieNinjas por cada ingrediente
     const resultados = [];
     const total = { calories: 0, protein_g: 0, fat_g: 0, carbs_g: 0 };
 
     for (const ing of ingredientesGemini) {
-      if (!ing || !ing.name_en || !ing.estimated_weight_g) continue;
+      if (!ing) continue;
 
-      const nombreIng = String(ing.name_en).toLowerCase();
+      const nameEn = String(ing.name_en || "").trim();
       const peso = Number(ing.estimated_weight_g);
 
-      if (!peso || peso <= 0) continue;
+      if (!nameEn || !Number.isFinite(peso) || peso <= 0) {
+        continue;
+      }
 
-      // ---------- 2.1) Obtener macros base (por porción) de CalorieNinjas ----------
-      if (!cacheMacrosIng[nombreIng]) {
+      const clave = nameEn.toLowerCase();
+
+      // 2A) Consultar o usar cache de ingrediente
+      if (!cacheMacrosIng[clave]) {
+        console.log("CalorieNinjas CALL:", clave);
+
         const resp = await fetch(
           `https://api.calorieninjas.com/v1/nutrition?query=${encodeURIComponent(
-            nombreIng
+            clave
           )}`,
           {
             headers: { "X-Api-Key": CALORIE_NINJAS_KEY },
@@ -472,17 +425,21 @@ Plato: "${plato}"
         );
 
         if (!resp.ok) {
-          console.error("CalorieNinjas ERROR ing:", nombreIng, resp.status);
-          cacheMacrosIng[nombreIng] = null;
+          const txt = await resp.text().catch(() => "");
+          console.error(
+            "Error CalorieNinjas",
+            resp.status,
+            resp.statusText,
+            txt
+          );
+          cacheMacrosIng[clave] = null;
         } else {
           const data = await resp.json();
-
           if (!data.items || data.items.length === 0) {
-            cacheMacrosIng[nombreIng] = null;
+            cacheMacrosIng[clave] = null;
           } else {
             const base = data.items[0];
-            cacheMacrosIng[nombreIng] = {
-              serving_g: base.serving_size_g || 100,
+            cacheMacrosIng[clave] = {
               calories: base.calories || 0,
               protein_g: base.protein_g || 0,
               fat_g: base.fat_total_g || 0,
@@ -492,12 +449,12 @@ Plato: "${plato}"
         }
       }
 
-      const base = cacheMacrosIng[nombreIng];
+      const base = cacheMacrosIng[clave];
 
-      // Si no tenemos datos de macros para este ingrediente, lo agregamos con 0s
+      // Si no hay datos para ese ingrediente, lo marcamos con 0 pero igual lo mostramos
       if (!base) {
         resultados.push({
-          name: ing.name_en,
+          name: nameEn,
           weight_g: peso,
           calories: 0,
           protein_g: 0,
@@ -507,39 +464,28 @@ Plato: "${plato}"
         continue;
       }
 
-      // ---------- 2.2) Escalar macros según el peso estimado ----------
-      const factor = peso / base.serving_g;
+      const factor = peso / 100;
 
-      const cals = base.calories * factor;
-      const prot = base.protein_g * factor;
-      const fat = base.fat_g * factor;
-      const carbs = base.carbs_g * factor;
-
-      resultados.push({
-        name: ing.name_en,
+      const item = {
+        name: nameEn,
         weight_g: peso,
-        calories: cals,
-        protein_g: prot,
-        fat_g: fat,
-        carbs_g: carbs,
-      });
+        calories: base.calories * factor,
+        protein_g: base.protein_g * factor,
+        fat_g: base.fat_g * factor,
+        carbs_g: base.carbs_g * factor,
+      };
 
-      total.calories += cals;
-      total.protein_g += prot;
-      total.fat_g += fat;
-      total.carbs_g += carbs;
-    }
+      resultados.push(item);
 
-    // Si por alguna razón no quedó ningún ingrediente, devolvemos error controlado
-    if (resultados.length === 0) {
-      return res
-        .status(500)
-        .json({ mensaje: "La IA no entregó ingredientes utilizables" });
+      total.calories += item.calories;
+      total.protein_g += item.protein_g;
+      total.fat_g += item.fat_g;
+      total.carbs_g += item.carbs_g;
     }
 
     const final = {
       nombre_original: plato,
-      traduccion: englishName,
+      traduccion: ia.english_name,
       ingredientes: resultados,
       total: {
         calories: Math.round(total.calories),
