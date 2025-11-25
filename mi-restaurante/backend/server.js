@@ -112,7 +112,7 @@ async function usarGeminiComoJSON(nombrePlato) {
     throw new Error("GEMINI_API_KEY no configurada en el servidor");
   }
 
-  const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   const prompt = `
 Eres un nutricionista experto. Te daré el nombre de un plato en español.
@@ -139,13 +139,14 @@ Estructura obligatoria:
 Plato: "${nombrePlato}"
 `;
 
-  const result = await model.generateContent(prompt);
+   const response = result.response;
+
 
   const rawText = result.response?.text
     ? result.response.text()
     : String(result.response || "");
 
-  let text = String(rawText).trim();
+  const text = response.text();
 
   // Limpia posible bloque ```json ... ```
   if (text.startsWith("```")) {
