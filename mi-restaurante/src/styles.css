@@ -186,6 +186,51 @@ body {
   border: 3px solid rgba(148,163,184,0.5);
   border-top-color: rgba(15,23,42,0.9);
   animation: spin 0.8s linear infinite;
+
+}
+
+
+.auth-card {
+  max-width: 420px;
+  margin: 4rem auto;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+}
+
+.auth-card h2 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+.auth-form label {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 0.6rem;
+  margin-top: 0.35rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  font-size: 0.95rem;
+}
+
+.auth-form .btn {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+/* Texto bajo el formulario (Google) */
+.auth-card > div:last-child {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
 }
 
 @keyframes spin {
