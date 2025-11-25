@@ -456,442 +456,452 @@ function App() {
           </label>
 
           {usuario && (
-            <div style={{ textAlign: "right" }}>
-              <div
-                className="usuario-conectado"
-                style={{ fontSize: "0.9rem", opacity: 0.9 }}
-              >
-                {t("layout.connectedAs")}{" "}
-                <strong>{usuario.nombre || usuario.email}</strong>
+              <div className="header-user-centered">
+                <div className="usuario-conectado">
+                  {t("layout.connectedAs")}{" "}
+                  <strong>{usuario.nombre || usuario.email}</strong>
+                </div>
+
+                <button
+                  className="btn-custom btn-small mt-1"
+                  onClick={handleLogout}
+                >
+                  {t("app.logout")}
+                </button>
               </div>
-              <button
-                className="btn-custom btn-small"
-                onClick={handleLogout}
-              >
-                {t("app.logout")}
-              </button>
-            </div>
-          )}
+            )}
         </div>
       </header>
 
-      <main className="row g-4 layout">
-        {/* Menú + filtros */}
-        <section className="col-12 col-lg-6 principal">
-          <div className="card filtros mb-4 p-3">
-            <h2 className="h5 mb-3">{t("app.filtersTitle")}</h2>
-            <input
-              type="text"
-              className="form-control mb-3"
-              placeholder={t("app.searchPlaceholder")}
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-            />
+      <main className="container mt-4">
+  <div className="row g-4">
 
-            <div className="filtros-linea row gy-2">
-              <div className="col-12 col-md-6 col-lg-4">
-                <label className="w-100">
-                  {t("app.filterTypeLabel")}
-                  <select
-                    value={tipo}
-                    onChange={(e) => setTipo(e.target.value)}
-                    className="form-select mt-1"
-                  >
-                    <option value="todos">{t("app.typeAll")}</option>
-                    <option value="entrada">{t("app.typeStarter")}</option>
-                    <option value="fondo">{t("app.typeMain")}</option>
-                    <option value="postre">{t("app.typeDessert")}</option>
-                    <option value="bebida">{t("app.typeDrink")}</option>
-                  </select>
-                </label>
-              </div>
+    {/* =========================
+        COLUMNA IZQUIERDA
+        ========================= */}
+    <section className="col-12 col-lg-6">
 
-              <div className="col-6 col-md-4 col-lg-3">
-                <label className="form-check">
-                  <input
-                    type="checkbox"
-                    className="form-check-input"
-                    checked={soloFríos}
-                    onChange={(e) => setSoloFríos(e.target.checked)}
-                  />
-                  <span className="form-check-label">
-                    {t("app.filterCold")}
-                  </span>
-                </label>
-              </div>
+      {/* --- FILTROS --- */}
+      <div className="card p-3 mb-4">
+        <h2 className="h5 mb-3">{t("app.filtersTitle")}</h2>
 
-              <div className="col-6 col-md-4 col-lg-3">
-                <label className="form-check">
-                  <input
-                    type="checkbox"
-                    className="form-check-input"
-                    checked={soloVeganos}
-                    onChange={(e) => setSoloVeganos(e.target.checked)}
-                  />
-                  <span className="form-check-label">
-                    {t("app.filterVegan")}
-                  </span>
-                </label>
-              </div>
+        <input
+          type="text"
+          className="form-control mb-3"
+          placeholder={t("app.searchPlaceholder")}
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+        />
 
-              <div className="col-6 col-md-4 col-lg-3">
-                <label className="form-check">
-                  <input
-                    type="checkbox"
-                    className="form-check-input"
-                    checked={soloPastas}
-                    onChange={(e) => setSoloPastas(e.target.checked)}
-                  />
-                  <span className="form-check-label">
-                    {t("app.filterPasta")}
-                  </span>
-                </label>
-              </div>
+        <div className="row gy-2">
 
-              <div className="col-6 col-md-4 col-lg-3">
-                <label className="form-check">
-                  <input
-                    type="checkbox"
-                    className="form-check-input"
-                    checked={soloMariscos}
-                    onChange={(e) => setSoloMariscos(e.target.checked)}
-                  />
-                  <span className="form-check-label">
-                    {t("app.filterSeafood")}
-                  </span>
-                </label>
-              </div>
-
-              <div className="col-6 col-md-4 col-lg-3">
-                <label className="form-check">
-                  <input
-                    type="checkbox"
-                    className="form-check-input"
-                    checked={soloAlcohol}
-                    onChange={(e) => setSoloAlcohol(e.target.checked)}
-                  />
-                  <span className="form-check-label">
-                    {t("app.filterAlcohol")}
-                  </span>
-                </label>
-              </div>
-
-              <div className="col-6 col-md-4 col-lg-3">
-                <label className="form-check">
-                  <input
-                    type="checkbox"
-                    className="form-check-input"
-                    checked={soloCarnes}
-                    onChange={(e) => setSoloCarnes(e.target.checked)}
-                  />
-                  <span className="form-check-label">
-                    {t("app.filterMeat")}
-                  </span>
-                </label>
-              </div>
-
-              <div className="col-6 col-md-4 col-lg-3">
-                <label className="form-check">
-                  <input
-                    type="checkbox"
-                    className="form-check-input"
-                    checked={soloSandwitches}
-                    onChange={(e) => setSoloSandwitches(e.target.checked)}
-                  />
-                  <span className="form-check-label">
-                    {t("app.filterSandwiches")}
-                  </span>
-                </label>
-              </div>
-            </div>
+          {/* Tipo */}
+          <div className="col-12 col-md-6 col-lg-4">
+            <label className="w-100">
+              {t("app.filterTypeLabel")}
+              <select
+                value={tipo}
+                onChange={(e) => setTipo(e.target.value)}
+                className="form-select mt-1"
+              >
+                <option value="todos">{t("app.typeAll")}</option>
+                <option value="entrada">{t("app.typeStarter")}</option>
+                <option value="fondo">{t("app.typeMain")}</option>
+                <option value="postre">{t("app.typeDessert")}</option>
+                <option value="bebida">{t("app.typeDrink")}</option>
+              </select>
+            </label>
           </div>
 
-          <div className="card p-3">
-            <h2 className="h5 mb-3">{t("app.menuTitle")}</h2>
-
-            {cargandoPlatos && <p>{t("app.loadingDishes")}</p>}
-            {errorPlatos && (
-              <p className="text-danger">{t("app.errorLoadDishes")}</p>
-            )}
-
-            {!cargandoPlatos && platosFiltrados.length === 0 && (
-              <p>{t("app.noDishesFound")}</p>
-            )}
-
-            <div className="row row-cols-1 g-4 lista-platos mt-2">
-
-              {platosFiltrados.map((plato) => {
-                const platoId = plato.id || plato._id;
-                const abierto = platoActivoId === platoId;
-
-                return (
-                  <div className="col" key={platoId}>
-                    <article
-                      className={`plato ${abierto ? "plato-abierto" : ""} h-100`}
-                      onClick={() =>
-                        setPlatoActivoId((prev) => (prev === platoId ? null : platoId))
-                      }
-                    >
-                      <div className="plato-contenido d-flex flex-column h-100">
-                        <div className="plato-header d-flex justify-content-between align-items-start">
-                          <h3 className="h6 mb-1">{plato.nombre}</h3>
-                          <p className="precio mb-0">
-                            ${plato.precio.toLocaleString("es-CL")}
-                          </p>
-                        </div>
-
-                        <p className="descripcion mb-2">{plato.descripcion}</p>
-
-                        {abierto &&
-                          plato.ingredientes &&
-                          plato.ingredientes.length > 0 && (
-                            <ul className="ingredientes mb-2">
-                              {plato.ingredientes.map((ing, i) => (
-                                <li key={i}>{ing}</li>
-                              ))}
-                            </ul>
-                          )}
-
-                        <div
-                          className="acciones-plato d-flex flex-column gap-2 mt-2"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Link
-                            to="/pedidos"
-                            className="btn-custom btn-primary-custom btn-small"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            Ir a pedidos
-                          </Link>
-
-
-                          <button
-                            className="btn btn-outline-secondary btn-sm"
-                            onClick={() => handleEditar(plato)}
-                          >
-                            {t("app.edit")}
-                          </button>
-
-                          <button
-                            className="btn btn-danger btn-sm"
-                            onClick={() => handleEliminar(platoId)}
-                          >
-                            {t("app.delete")}
-                          </button>
-
-                          <button
-                            className="btn btn-outline-primary btn-sm"
-                            onClick={() => verMacros(plato)}
-                            style={{ marginTop: "0.3rem" }}
-                            disabled={cargandoMacros}
-                          >
-                            {cargandoMacros ? t("app.loading") : t("app.viewMacros")}
-                          </button>
-                        </div>
-                      </div>
-                    </article>
-                  </div>
-
-                );
-              })}
-            </div>
+          {/* Checkboxes */}
+          <div className="col-6 col-md-4 col-lg-3">
+            <label className="form-check">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                checked={soloFríos}
+                onChange={(e) => setSoloFríos(e.target.checked)}
+              />
+              <span className="form-check-label">{t("app.filterCold")}</span>
+            </label>
           </div>
-        </section>
 
-        {/* Formulario + Pedido */}
-        <section className="col-12 col-lg-6 lateral">
-          <div className="card mb-4 p-3">
-            <h2 className="h5 mb-3">
-              {editando ? t("app.editDishTitle") : t("app.newDishTitle")}
-            </h2>
+          <div className="col-6 col-md-4 col-lg-3">
+            <label className="form-check">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                checked={soloVeganos}
+                onChange={(e) => setSoloVeganos(e.target.checked)}
+              />
+              <span className="form-check-label">{t("app.filterVegan")}</span>
+            </label>
+          </div>
 
-            <form onSubmit={handleSubmit} className="form-plato">
-              <label className="form-label">
-                {t("app.fieldName")}
-                <input
-                  name="nombre"
-                  value={form.nombre}
-                  onChange={handleChangeForm}
-                  required
-                  className="form-control"
-                />
-              </label>
+          <div className="col-6 col-md-4 col-lg-3">
+            <label className="form-check">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                checked={soloPastas}
+                onChange={(e) => setSoloPastas(e.target.checked)}
+              />
+              <span className="form-check-label">{t("app.filterPasta")}</span>
+            </label>
+          </div>
 
-              <label className="form-label mt-2">
-                {t("app.fieldDescription")}
-                <textarea
-                  name="descripcion"
-                  value={form.descripcion}
-                  onChange={handleChangeForm}
-                  className="form-control"
-                />
-              </label>
+          <div className="col-6 col-md-4 col-lg-3">
+            <label className="form-check">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                checked={soloMariscos}
+                onChange={(e) => setSoloMariscos(e.target.checked)}
+              />
+              <span className="form-check-label">{t("app.filterSeafood")}</span>
+            </label>
+          </div>
 
-              <label className="form-label mt-2">
-                {t("app.fieldIngredients")}
-                <textarea
-                  name="ingredientesTexto"
-                  value={form.ingredientesTexto}
-                  onChange={handleChangeForm}
-                  placeholder={t("app.ingredientsPlaceholder")}
-                  className="form-control"
-                />
-              </label>
+          <div className="col-6 col-md-4 col-lg-3">
+            <label className="form-check">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                checked={soloAlcohol}
+                onChange={(e) => setSoloAlcohol(e.target.checked)}
+              />
+              <span className="form-check-label">
+                {t("app.filterAlcohol")}
+              </span>
+            </label>
+          </div>
 
-              <label className="form-label mt-2">
-                {t("app.fieldPrice")}
-                <input
-                  name="precio"
-                  type="number"
-                  min="0"
-                  value={form.precio}
-                  onChange={handleChangeForm}
-                  required
-                  className="form-control"
-                />
-              </label>
+          <div className="col-6 col-md-4 col-lg-3">
+            <label className="form-check">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                checked={soloCarnes}
+                onChange={(e) => setSoloCarnes(e.target.checked)}
+              />
+              <span className="form-check-label">{t("app.filterMeat")}</span>
+            </label>
+          </div>
 
-              <label className="form-label mt-2">
-                {t("app.fieldType")}
-                <select
-                  name="tipo"
-                  value={form.tipo}
-                  onChange={handleChangeForm}
-                  className="form-select"
+          <div className="col-6 col-md-4 col-lg-3">
+            <label className="form-check">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                checked={soloSandwitches}
+                onChange={(e) => setSoloSandwitches(e.target.checked)}
+              />
+              <span className="form-check-label">
+                {t("app.filterSandwiches")}
+              </span>
+            </label>
+          </div>
+
+        </div>
+      </div>
+
+      {/* --- MENÚ --- */}
+      <div className="card p-3">
+        <h2 className="h5 mb-3">{t("app.menuTitle")}</h2>
+
+        {cargandoPlatos && <p>{t("app.loadingDishes")}</p>}
+        {errorPlatos && (
+          <p className="text-danger">{t("app.errorLoadDishes")}</p>
+        )}
+        {!cargandoPlatos && platosFiltrados.length === 0 && (
+          <p>{t("app.noDishesFound")}</p>
+        )}
+
+        <div className="row row-cols-1 g-4 lista-platos mt-2">
+          {platosFiltrados.map((plato) => {
+            const platoId = plato.id || plato._id;
+            const abierto = platoActivoId === platoId;
+
+            return (
+              <div className="col" key={platoId}>
+                <article
+                  className={`plato ${abierto ? "plato-abierto" : ""} h-100`}
+                  onClick={() =>
+                    setPlatoActivoId((prev) =>
+                      prev === platoId ? null : platoId
+                    )
+                  }
                 >
-                  <option value="entrada">{t("app.typeStarter")}</option>
-                  <option value="fondo">{t("app.typeMain")}</option>
-                  <option value="postre">{t("app.typeDessert")}</option>
-                  <option value="bebida">{t("app.typeDrink")}</option>
-                </select>
-              </label>
+                  <div className="plato-contenido d-flex flex-column h-100">
+                    <div className="d-flex justify-content-between">
+                      <h3 className="h6 mb-1">{plato.nombre}</h3>
+                      <p className="precio mb-0">
+                        ${plato.precio.toLocaleString("es-CL")}
+                      </p>
+                    </div>
 
-              <div className="checks mt-3 row gy-1">
-                <div className="col-6">
-                  <label className="form-check">
-                    <input
-                      type="checkbox"
-                      name="esFrio"
-                      checked={form.esFrio}
-                      onChange={handleChangeForm}
-                      className="form-check-input"
-                    />
-                    <span className="form-check-label">
-                      {t("app.filterCold")}
-                    </span>
-                  </label>
-                </div>
+                    <p className="descripcion mb-2">{plato.descripcion}</p>
 
-                <div className="col-6">
-                  <label className="form-check">
-                    <input
-                      type="checkbox"
-                      name="esVegano"
-                      checked={form.esVegano}
-                      onChange={handleChangeForm}
-                      className="form-check-input"
-                    />
-                    <span className="form-check-label">
-                      {t("app.filterVegan")}
-                    </span>
-                  </label>
-                </div>
+                    {abierto &&
+                      plato.ingredientes &&
+                      plato.ingredientes.length > 0 && (
+                        <ul className="ingredientes mb-2">
+                          {plato.ingredientes.map((ing, i) => (
+                            <li key={i}>{ing}</li>
+                          ))}
+                        </ul>
+                      )}
 
-                <div className="col-6">
-                  <label className="form-check">
-                    <input
-                      type="checkbox"
-                      name="esPasta"
-                      checked={form.esPasta}
-                      onChange={handleChangeForm}
-                      className="form-check-input"
-                    />
-                    <span className="form-check-label">
-                      {t("app.filterPasta")}
-                    </span>
-                  </label>
-                </div>
+                    <div
+                      className="acciones-plato d-flex flex-column gap-2 mt-2"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Link
+                        to="/pedidos"
+                        className="btn btn-primary btn-sm"
+                      >
+                        Ir a pedidos
+                      </Link>
 
-                <div className="col-6">
-                  <label className="form-check">
-                    <input
-                      type="checkbox"
-                      name="esMarisco"
-                      checked={form.esMarisco}
-                      onChange={handleChangeForm}
-                      className="form-check-input"
-                    />
-                    <span className="form-check-label">
-                      {t("app.filterSeafood")}
-                    </span>
-                  </label>
-                </div>
+                      <button
+                        className="btn btn-outline-secondary btn-sm"
+                        onClick={() => handleEditar(plato)}
+                      >
+                        {t("app.edit")}
+                      </button>
 
-                <div className="col-6">
-                  <label className="form-check">
-                    <input
-                      type="checkbox"
-                      name="esAlcohol"
-                      checked={form.esAlcohol}
-                      onChange={handleChangeForm}
-                      className="form-check-input"
-                    />
-                    <span className="form-check-label">
-                      {t("app.filterAlcohol")}
-                    </span>
-                  </label>
-                </div>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleEliminar(platoId)}
+                      >
+                        {t("app.delete")}
+                      </button>
 
-                <div className="col-6">
-                  <label className="form-check">
-                    <input
-                      type="checkbox"
-                      name="esCarne"
-                      checked={form.esCarne}
-                      onChange={handleChangeForm}
-                      className="form-check-input"
-                    />
-                    <span className="form-check-label">
-                      {t("app.filterMeat")}
-                    </span>
-                  </label>
-                </div>
-
-                <div className="col-12">
-                  <label className="form-check">
-                    <input
-                      type="checkbox"
-                      name="esSandwitch"
-                      checked={form.esSandwitch}
-                      onChange={handleChangeForm}
-                      className="form-check-input"
-                    />
-                    <span className="form-check-label">
-                      {t("app.filterSandwiches")}
-                    </span>
-                  </label>
-                </div>
+                      <button
+                        className="btn btn-outline-primary btn-sm"
+                        onClick={() => verMacros(plato)}
+                        disabled={cargandoMacros}
+                      >
+                        {cargandoMacros
+                          ? t("app.loading")
+                          : t("app.viewMacros")}
+                      </button>
+                    </div>
+                  </div>
+                </article>
               </div>
+            );
+          })}
+        </div>
+      </div>
 
-              <div className="form-acciones d-flex gap-2 mt-3">
-                <button className="btn-custom btn-primary-custom" type="submit">
-                  {editando ? t("app.formSave") : t("app.formCreate")}
-                </button>
+    </section>
 
-                {editando && (
-                  <button
-                    className="btn btn-outline-secondary"
-                    type="button"
-                    onClick={limpiarFormulario}
-                  >
-                    {t("app.formCancel")}
-                  </button>
-                )}
-              </div>
-            </form>
-          </div>
-        </section>
-      </main>
+    {/* =========================
+        COLUMNA DERECHA
+        ========================= */}
+    <section className="col-12 col-lg-6">
+
+      <div className="card p-3">
+  <h2 className="h5 mb-3">
+    {editando ? t("app.editDishTitle") : t("app.newDishTitle")}
+  </h2>
+
+  <form onSubmit={handleSubmit} className="form-plato">
+
+    {/* Nombre */}
+    <div className="mb-3">
+      <label className="form-label">{t("app.fieldName")}</label>
+      <input
+        name="nombre"
+        value={form.nombre}
+        onChange={handleChangeForm}
+        required
+        className="form-control"
+      />
+    </div>
+
+    {/* Descripción */}
+    <div className="mb-3">
+      <label className="form-label">{t("app.fieldDescription")}</label>
+      <textarea
+        name="descripcion"
+        value={form.descripcion}
+        onChange={handleChangeForm}
+        className="form-control"
+      />
+    </div>
+
+    {/* Ingredientes & Precio en la misma fila */}
+    <div className="row g-3">
+
+      <div className="col-12 col-md-8">
+        <label className="form-label">
+          {t("app.fieldIngredients")}
+        </label>
+        <textarea
+          name="ingredientesTexto"
+          value={form.ingredientesTexto}
+          onChange={handleChangeForm}
+          placeholder={t("app.ingredientsPlaceholder")}
+          className="form-control"
+        />
+      </div>
+
+      <div className="col-12 col-md-4">
+        <label className="form-label">{t("app.fieldPrice")}</label>
+        <input
+          name="precio"
+          type="number"
+          min="0"
+          value={form.precio}
+          onChange={handleChangeForm}
+          required
+          className="form-control"
+        />
+      </div>
+
+    </div>
+
+    {/* Tipo */}
+    <div className="mt-3 mb-2">
+      <label className="form-label">{t("app.fieldType")}</label>
+      <select
+        name="tipo"
+        value={form.tipo}
+        onChange={handleChangeForm}
+        className="form-select"
+      >
+        <option value="entrada">{t("app.typeStarter")}</option>
+        <option value="fondo">{t("app.typeMain")}</option>
+        <option value="postre">{t("app.typeDessert")}</option>
+        <option value="bebida">{t("app.typeDrink")}</option>
+      </select>
+    </div>
+
+    {/* Checkboxes (grid natural de Bootstrap) */}
+    <div className="row mt-2 gy-2">
+
+      <div className="col-6">
+        <label className="form-check">
+          <input
+            type="checkbox"
+            name="esFrio"
+            checked={form.esFrio}
+            onChange={handleChangeForm}
+            className="form-check-input"
+          />
+          <span className="form-check-label">{t("app.filterCold")}</span>
+        </label>
+      </div>
+
+      <div className="col-6">
+        <label className="form-check">
+          <input
+            type="checkbox"
+            name="esVegano"
+            checked={form.esVegano}
+            onChange={handleChangeForm}
+            className="form-check-input"
+          />
+          <span className="form-check-label">{t("app.filterVegan")}</span>
+        </label>
+      </div>
+
+      <div className="col-6">
+        <label className="form-check">
+          <input
+            type="checkbox"
+            name="esPasta"
+            checked={form.esPasta}
+            onChange={handleChangeForm}
+            className="form-check-input"
+          />
+          <span className="form-check-label">{t("app.filterPasta")}</span>
+        </label>
+      </div>
+
+      <div className="col-6">
+        <label className="form-check">
+          <input
+            type="checkbox"
+            name="esMarisco"
+            checked={form.esMarisco}
+            onChange={handleChangeForm}
+            className="form-check-input"
+          />
+          <span className="form-check-label">{t("app.filterSeafood")}</span>
+        </label>
+      </div>
+
+      <div className="col-6">
+        <label className="form-check">
+          <input
+            type="checkbox"
+            name="esAlcohol"
+            checked={form.esAlcohol}
+            onChange={handleChangeForm}
+            className="form-check-input"
+          />
+          <span className="form-check-label">{t("app.filterAlcohol")}</span>
+        </label>
+      </div>
+
+      <div className="col-6">
+        <label className="form-check">
+          <input
+            type="checkbox"
+            name="esCarne"
+            checked={form.esCarne}
+            onChange={handleChangeForm}
+            className="form-check-input"
+          />
+          <span className="form-check-label">{t("app.filterMeat")}</span>
+        </label>
+      </div>
+
+      <div className="col-12">
+        <label className="form-check">
+          <input
+            type="checkbox"
+            name="esSandwitch"
+            checked={form.esSandwitch}
+            onChange={handleChangeForm}
+            className="form-check-input"
+          />
+          <span className="form-check-label">
+            {t("app.filterSandwiches")}
+          </span>
+        </label>
+      </div>
+
+    </div>
+
+    {/* Botones */}
+    <div className="d-flex gap-2 mt-4">
+      <button className="btn btn-primary" type="submit">
+        {editando ? t("app.formSave") : t("app.formCreate")}
+      </button>
+
+      {editando && (
+        <button
+          className="btn btn-outline-secondary"
+          type="button"
+          onClick={limpiarFormulario}
+        >
+          {t("app.formCancel")}
+        </button>
+      )}
+    </div>
+
+  </form>
+</div>
+
+    </section>
+
+  </div>
+</main>
+
 
       {modalAbierto && macroData && (
         <div

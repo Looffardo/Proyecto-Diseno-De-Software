@@ -103,14 +103,18 @@ function authMiddleware(req, res, next) {
 // ================== HELPER: Gemini → JSON ========================
 // ================================================================
 async function usarGeminiComoJSON(prompt) {
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: prompt,
-  });
+  // Si tu SDK soporta getGenerativeModel:
+  const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const result = await model.generateContent(prompt);
 
-  let text = response.text || response.text();
-  text = String(text).trim();
+  // En muchos SDKs viene como result.response.text()
+  const rawText = result.response?.text
+    ? result.response.text()
+    : (typeof result.text === "function" ? result.text() : String(result.text || ""));
 
+  let text = String(rawText).trim();
+
+  // Limpiar bloques ```json ... ```
   if (text.startsWith("```")) {
     text = text
       .replace(/^```json/i, "")
@@ -119,8 +123,14 @@ async function usarGeminiComoJSON(prompt) {
       .trim();
   }
 
-  return JSON.parse(text);
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    console.error("Error parseando JSON de Gemini:", text);
+    throw new Error("La IA no devolvió JSON válido");
+  }
 }
+
 
 // ================================================================
 // ======================== RUTAS AUTENTICACIÓN ====================
@@ -341,13 +351,31 @@ Plato: "${plato}"
 `;
 
     const ia = await usarGeminiComoJSON(prompt);
+    
+    if (!ia || typeof ia !== "object") {
+      return res.status(500).json({ mensaje: "La IA no entregó un objeto válido" });
+    }
+
+    if (!Array.isArray(ia.ingredients) || ia.ingredients.length === 0) {
+      return res.status(500).json({
+        mensaje: "La IA no entregó ingredientes válidos",
+        detalle: ia,
+      });
+    }
+
 
     const resultados = [];
     const total = { calories: 0, protein_g: 0, fat_g: 0, carbs_g: 0 };
 
     for (const ing of ia.ingredients) {
-      const nombreIng = ing.name_en.toLowerCase();
-      const peso = ing.estimated_weight_g;
+
+   
+    if (!ing || !ing.name_en || !ing.estimated_weight_g) {
+      continue;
+    }
+
+    const nombreIng = ing.name_en.toLowerCase();
+    const peso = ing.estimated_weight_g;
 
       if (!cacheMacrosIng[nombreIng]) {
         const resp = await fetch(

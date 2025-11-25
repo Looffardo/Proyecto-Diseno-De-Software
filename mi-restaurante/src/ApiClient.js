@@ -16,7 +16,8 @@ export function setToken(token) {
 
 // === IA NUTRICIÓN ===
 export async function obtenerIANutricion(nombrePlato) {
-  return apiRequest(`/api/ia-nutricion?q=${encodeURIComponent(nombrePlato)}`);
+  const params = new URLSearchParams({ q: nombrePlato });
+  return apiRequest(`/api/ia-nutricion?${params.toString()}`);
 }
 
 // === GENÉRICO ===
@@ -24,9 +25,9 @@ export async function apiRequest(path, options = {}) {
   const headers = options.headers ? { ...options.headers } : {};
   const token = getToken();
 
-  if (!(options.body instanceof FormData)) {
-    headers['Content-Type'] = 'application/json';
-  }
+ if (options.body && !(options.body instanceof FormData)) {
+  headers['Content-Type'] = 'application/json';
+}
 
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
@@ -82,4 +83,8 @@ export async function crearPedido(pedido) {
     method: 'POST',
     body: pedido,
   });
+}
+// Obtener Pedidos 
+export async function obtenerPedidos() {
+  return apiRequest('/api/pedidos');
 }
