@@ -19,7 +19,8 @@ const platosRouter = require("./rutas/platos");
 const pedidosRouter = require("./rutas/pedidos");
 
 const app = express();
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
+
 
 // MongoDB
 mongoose
