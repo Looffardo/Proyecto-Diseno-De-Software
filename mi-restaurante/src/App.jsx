@@ -853,7 +853,7 @@ function App() {
               <p>{t("app.noDishesFound")}</p>
             )}
 
-            <div className="row row-cols-1 row-cols-sm-2 row-cols-xl-2 g-3 lista-platos mt-2">
+            <div className="row row-cols-1 row-cols-md-2 row-cols-xl-2 g-4 lista-platos mt-2">
 
               {platosFiltrados.map((plato) => {
                 const platoId = plato.id || plato._id;
