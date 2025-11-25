@@ -443,44 +443,6 @@ function App() {
   });
 
   const [platoActivoId, setPlatoActivoId] = useState(null);
-//  const [pedido, setPedido] = useState([]);
-
-//  const agregarAlPedido = (plato) => {
-//    setPedido((prev) => [...prev, plato]);
-//  };
-
-//  const totalPedido = useMemo(
-//    () => pedido.reduce((acc, p) => acc + p.precio, 0),
-//    [pedido]
-//  );
-
-//  const confirmarPedido = async () => {
-//    if (pedido.length === 0) {
-//      alert(t("app.alertEmptyOrder"));
-//      return;
-//    }
-
-    const items = pedido.map((p) => ({
-      platoId: p.id || p._id,
-      nombre: p.nombre,
-      precioUnitario: p.precio,
-      cantidad: 1,
-    }));
-
-    const payload = {
-      items,
-      total: totalPedido,
-    };
-
-    try {
-      await crearPedido(payload);
-      alert(t("app.orderSaved"));
-      setPedido([]);
-    } catch (err) {
-      console.error(err);
-      alert(t("app.orderSaveError"));
-    }
-  };
 
   const platosFiltrados = useMemo(() => {
     return platos.filter((plato) => {
