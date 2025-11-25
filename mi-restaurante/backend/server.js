@@ -351,7 +351,7 @@ Plato: "${plato}"
 `;
 
     const ia = await usarGeminiComoJSON(prompt);
-    
+
     if (!ia || typeof ia !== "object") {
       return res.status(500).json({ mensaje: "La IA no entregó un objeto válido" });
     }
@@ -367,7 +367,6 @@ Plato: "${plato}"
     const total = { calories: 0, protein_g: 0, fat_g: 0, carbs_g: 0 };
 
     for (const ing of ia.ingredients) {
-
       if (!ing || !ing.name_en || !ing.estimated_weight_g) {
         continue;
       }
@@ -375,7 +374,7 @@ Plato: "${plato}"
       const nombreIng = ing.name_en.toLowerCase();
       const peso = ing.estimated_weight_g;
 
-      // ==== CACHE POR INGREDIENTE ====
+      // Cache ingrediente
       if (!cacheMacrosIng[nombreIng]) {
         const resp = await fetch(
           `https://api.calorieninjas.com/v1/nutrition?query=${encodeURIComponent(
@@ -395,8 +394,8 @@ Plato: "${plato}"
           cacheMacrosIng[nombreIng] = {
             calories: base.calories || 0,
             protein_g: base.protein_g || 0,
-            fat_total_g: base.fat_total_g || 0,
-            carbohydrates_total_g: base.carbohydrates_total_g || 0,
+            fat_g: base.fat_total_g || 0, // ← CORREGIDO
+            carbs_g: base.carbohydrates_total_g || 0, // ← CORREGIDO
           };
         }
       }
@@ -421,14 +420,14 @@ Plato: "${plato}"
         weight_g: peso,
         calories: base.calories * factor,
         protein_g: base.protein_g * factor,
-        fat_g: base.fat_total_g * factor,
-        carbs_g: base.carbohydrates_total_g * factor,
+        fat_g: base.fat_g * factor,
+        carbs_g: base.carbs_g * factor,
       });
 
       total.calories += base.calories * factor;
       total.protein_g += base.protein_g * factor;
-      total.fat_g += base.fat_total_g * factor;
-      total.carbs_g += base.carbohydrates_total_g * factor;
+      total.fat_g += base.fat_g * factor;
+      total.carbs_g += base.carbs_g * factor;
     }
 
     const final = {
@@ -447,10 +446,11 @@ Plato: "${plato}"
 
     return res.json(final);
   } catch (err) {
-    console.error("❌ Error en IA Nutrición:", err);
+    console.error(err);
     return res.status(500).json({ mensaje: "Error en IA Nutrición" });
   }
 });
+
 
 // ================================================================
 // ======================= RUTAS DE PLATOS/PEDIDOS =================
