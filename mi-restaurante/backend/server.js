@@ -354,7 +354,7 @@ app.get("/api/nutricion", async (req, res) => {
 // ================================================================
 // =========================== IA NUTRICIÓN =========================
 // ================================================================
-app.get("/api/ia-nutricion", async (req, res) => {
+app.get("/api/nutricion", async (req, res) => {
   try {
     const plato = req.query.q;
     if (!plato) {
@@ -498,7 +498,7 @@ Reglas importantes:
     cacheIA[plato] = final;
     return res.json(final);
   } catch (err) {
-    console.error("Error en /api/ia-nutricion:", err);
+    console.error("Error en /api/nutricion:", err);
     return res.status(500).json({ mensaje: "Error en IA Nutrición" });
   }
 });
