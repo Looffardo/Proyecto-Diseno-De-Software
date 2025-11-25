@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { crearPedido } from "./api/pedidosAPI"; 
-import { obtenerPlatos } from "./api/platosAPI";
+import {crearPedido, obtenerPlatos} from "./ApiClient";
 
 export default function PedidosPage() {
   const [platos, setPlatos] = useState([]);
