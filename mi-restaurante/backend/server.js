@@ -10,7 +10,7 @@ require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { GoogleGenAI } = require("@google/genai");
 
 
 const fetch =
@@ -50,7 +50,9 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
 const CALORIE_NINJAS_KEY = process.env.CALORIE_NINJAS_KEY || "";
 
 // Google Gemini
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
 
 // Google OAuth
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
@@ -110,7 +112,7 @@ async function usarGeminiComoJSON(nombrePlato) {
     throw new Error("GEMINI_API_KEY no configurada en el servidor");
   }
 
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
 
   const prompt = `
 Eres un nutricionista experto. Te daré el nombre de un plato en español.
@@ -137,17 +139,13 @@ Estructura obligatoria:
 Plato: "${nombrePlato}"
 `;
 
-  // 👉 ESTA LÍNEA ES NUEVA: hace la llamada a Gemini
   const result = await model.generateContent(prompt);
-
-  const response = result.response;
 
   const rawText = result.response?.text
     ? result.response.text()
     : String(result.response || "");
 
-  // 👉 AQUÍ SOLO CAMBIO const → let, para poder modificar text después
-  let text = response.text();
+  let text = String(rawText).trim();
 
   // Limpia posible bloque ```json ... ```
   if (text.startsWith("```")) {
@@ -165,7 +163,6 @@ Plato: "${nombrePlato}"
     throw new Error("IA_JSON_INVALIDO");
   }
 }
-
 
 // ================================================================
 // ======================== RUTAS AUTENTICACIÓN ====================
