@@ -20,15 +20,76 @@
     "emailLabel": "Email",
     "passwordLabel": "Password",
     "haveAccount": "Already have an account?",
-    "noAccount": "Don't have an account?"
+    "noAccount": "Don't have an account?",
+    "googleError": "Error signing in with Google"
   },
   "app": {
     "welcomeUser": "Hi, {{name}}",
     "logout": "Log out",
-    "menuTitle": "Restaurant menu",
-    "filtersTitle": "Filters",
+    "connectedAs": "Signed in as:",
+
+    "filtersTitle": "Search and filter",
+    "menuTitle": "Menu",
     "orderSectionTitle": "Your order",
     "confirmOrder": "Confirm order",
-    "totalLabel": "Total"
+    "totalLabel": "Total",
+    "emptyOrder": "You haven't added anything to the order.",
+
+    "loadingDishes": "Loading dishes...",
+    "errorLoadDishes": "Could not load dishes.",
+    "noDishesFound": "No dishes match those filters.",
+
+    "searchPlaceholder": "Search dish...",
+    "filterTypeLabel": "Type:",
+    "typeAll": "All",
+    "typeStarter": "Starter",
+    "typeMain": "Main course",
+    "typeDessert": "Dessert",
+    "typeDrink": "Drink",
+    "filterCold": "Cold preparations",
+    "filterVegan": "Vegan-friendly",
+    "filterPasta": "Pasta",
+    "filterSeafood": "Seafood",
+    "filterAlcohol": "Alcoholic drinks",
+    "filterMeat": "Meat",
+    "filterSandwiches": "Sandwiches and/or burgers",
+
+    "addToOrder": "Add to order",
+    "edit": "Edit",
+    "delete": "Delete",
+    "viewMacros": "View macros",
+    "loading": "Loading...",
+
+    "editDishTitle": "Edit dish",
+    "newDishTitle": "New dish",
+    "fieldName": "Name",
+    "fieldDescription": "Description",
+    "fieldIngredients": "Ingredients (comma separated)",
+    "fieldPrice": "Price",
+    "fieldType": "Type",
+    "ingredientsPlaceholder": "Ex: Tomato, Cheese, Basil",
+
+    "formSave": "Save changes",
+    "formCreate": "Create dish",
+    "formCancel": "Cancel",
+
+    "alertEmptyOrder": "There are no dishes in the order.",
+    "orderSaved": "Order saved to the database.",
+    "orderSaveError": "Error saving the order.",
+    "priceMustBePositive": "Price must be a number greater than 0.",
+    "dishSaveError": "Error saving the dish.",
+    "confirmDeleteDish": "Are you sure you want to delete this dish?",
+    "dishDeleteError": "Error deleting the dish.",
+
+    "macroError": "Error fetching nutritional information."
+  },
+  "macro": {
+    "title": "Nutritional information",
+    "dishLabel": "Dish:",
+    "translationLabel": "AI translation:",
+    "totalsTitle": "Totals",
+    "ingredientsTitle": "Analyzed ingredients",
+    "closeButton": "Close",
+    "loadingText": "Loading nutritional information..."
   }
 }

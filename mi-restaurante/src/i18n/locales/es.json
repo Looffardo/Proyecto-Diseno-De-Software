@@ -20,15 +20,78 @@
     "emailLabel": "Email",
     "passwordLabel": "Contraseña",
     "haveAccount": "¿Ya tienes cuenta?",
-    "noAccount": "¿No tienes cuenta?"
+    "noAccount": "¿No tienes cuenta?",
+    "googleError": "Error al iniciar con Google"
   },
   "app": {
     "welcomeUser": "Hola, {{name}}",
     "logout": "Cerrar sesión",
-    "menuTitle": "Menú del restaurante",
-    "filtersTitle": "Filtros",
+
+    "connectedAs": "Conectado como:",
+
+    "filtersTitle": "Buscar y filtrar",
+    "menuTitle": "Menú",
     "orderSectionTitle": "Tu pedido",
     "confirmOrder": "Confirmar pedido",
-    "totalLabel": "Total"
+    "totalLabel": "Total",
+    "emptyOrder": "No has agregado nada al pedido.",
+
+    "loadingDishes": "Cargando platos...",
+    "errorLoadDishes": "No se pudieron cargar los platos.",
+    "noDishesFound": "No se encontraron platos con esos filtros.",
+
+    "searchPlaceholder": "Buscar plato...",
+    "filterTypeLabel": "Tipo:",
+    "typeAll": "Todos",
+    "typeStarter": "Entrada",
+    "typeMain": "Plato de fondo",
+    "typeDessert": "Postre",
+    "typeDrink": "Bebida",
+    "filterCold": "Preparaciones frías",
+    "filterVegan": "Apto para veganos",
+    "filterPasta": "Pastas",
+    "filterSeafood": "Mariscos",
+    "filterAlcohol": "Bebidas alcohólicas",
+    "filterMeat": "Carnes",
+    "filterSandwiches": "Sándwiches y/o hamburguesas",
+
+    "addToOrder": "Añadir al pedido",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "viewMacros": "Ver macros",
+    "loading": "Cargando...",
+
+    "editDishTitle": "Editar plato",
+    "newDishTitle": "Nuevo plato",
+    "fieldName": "Nombre",
+    "fieldDescription": "Descripción",
+    "fieldIngredients": "Ingredientes (separados por coma)",
+    "fieldPrice": "Precio",
+    "fieldType": "Tipo",
+    "ingredientsPlaceholder": "Ej: Tomate, Queso, Albahaca",
+
+    "formSave": "Guardar cambios",
+    "formCreate": "Crear plato",
+    "formCancel": "Cancelar",
+
+    "alertEmptyOrder": "No hay platos en el pedido.",
+    "orderSaved": "Pedido guardado en la base de datos.",
+    "orderSaveError": "Error al guardar el pedido.",
+    "priceMustBePositive": "El precio debe ser un número mayor a 0.",
+    "dishSaveError": "Error al guardar el plato.",
+    "confirmDeleteDish": "¿Seguro que deseas eliminar este plato?",
+    "dishDeleteError": "Error al eliminar el plato.",
+
+    "macroError": "Error obteniendo información nutricional."
+  },
+  "macro": {
+    "title": "Información nutricional",
+    "dishLabel": "Plato:",
+    "translationLabel": "Traducción IA:",
+    "totalsTitle": "Totales",
+    "ingredientsTitle": "Ingredientes analizados",
+    "closeButton": "Cerrar",
+    "loadingText": "Cargando información nutricional..."
   }
+  
 }
