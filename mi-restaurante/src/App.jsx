@@ -5,7 +5,6 @@ import {
   getToken,
   setToken,
   apiRequest,
-  obtenerIANutricion,
   obtenerPlatos,
   crearPlato,
   actualizarPlato,
@@ -13,6 +12,9 @@ import {
 } from "./ApiClient";
 import { useI18n } from "./i18n/I18nProvider";
 import { Link } from "react-router-dom";
+
+
+import ChatBot from "./ChatBot";
 
 
 // Lógica central de la app
@@ -49,9 +51,8 @@ function App() {
   const [soloCarnes, setSoloCarnes] = useState(false);
   const [soloSandwitches, setSoloSandwitches] = useState(false);
 
-  const [modalAbierto, setModalAbierto] = useState(false);
-  const [macroData, setMacroData] = useState(null);
-  const [cargandoMacros, setCargandoMacros] = useState(false);
+  
+  
 
   const [editando, setEditando] = useState(null);
   const [form, setForm] = useState({
@@ -208,21 +209,7 @@ function App() {
     }
   };
 
-  const verMacros = async (plato) => {
-    try {
-      setCargandoMacros(true);
-      setMacroData(null);
-
-      const data = await obtenerIANutricion(plato.nombre);
-      setMacroData(data);
-      setModalAbierto(true);
-    } catch (err) {
-      console.error(err);
-      alert(t("app.macroError"));
-    } finally {
-      setCargandoMacros(false);
-    }
-  };
+  
 
   // === AUTH ===
   const [usuario, setUsuario] = useState(null);
@@ -255,6 +242,7 @@ function App() {
 
   // === INTERFAZ PRINCIPAL ===
   return (
+    <>
     <div className="container app mt-4">
       <header className="header mb-4">
         <h1 className="mb-0">{t("layout.appTitle")}</h1>
@@ -502,15 +490,7 @@ function App() {
                         {t("app.delete")}
                       </button>
 
-                      <button
-                        className="btn btn-outline-primary btn-sm"
-                        onClick={() => verMacros(plato)}
-                        disabled={cargandoMacros}
-                      >
-                        {cargandoMacros
-                          ? t("app.loading")
-                          : t("app.viewMacros")}
-                      </button>
+                      
                     </div>
                   </div>
                 </article>
@@ -726,84 +706,10 @@ function App() {
 
   </div>
 </main>
-
-
-      {modalAbierto && macroData && (
-        <div
-          className="modal-fondo"
-          onClick={() => setModalAbierto(false)}
-        >
-          <div
-            className="modal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2>{t("macro.title")}</h2>
-
-            <p>
-              <strong>{t("macro.dishLabel")} </strong>
-              {macroData.nombre_original}
-            </p>
-            <p>
-              <strong>{t("macro.translationLabel")} </strong>
-              {macroData.traduccion}
-            </p>
-
-            <h3>{t("macro.totalsTitle")}</h3>
-            <div className="macro-totales">
-              <p>
-                <strong>Calorías:</strong>{" "}
-                {macroData.total.calories} kcal
-              </p>
-              <p>
-                <strong>Proteína:</strong>{" "}
-                {macroData.total.protein_g} g
-              </p>
-              <p>
-                <strong>Grasas:</strong>{" "}
-                {macroData.total.fat_g} g
-              </p>
-              <p>
-                <strong>Carbohidratos:</strong>{" "}
-                {macroData.total.carbs_g} g
-              </p>
-            </div>
-
-            <h3>{t("macro.ingredientsTitle")}</h3>
-            <ul className="ingredientes-macro">
-              {macroData.ingredientes.map((i, idx) => (
-                <li key={idx}>
-                  <strong>{i.name}</strong> — {i.weight_g}g
-                  <br />
-                  {i.calories.toFixed(0)} kcal ·{" "}
-                  {i.protein_g.toFixed(1)}g prot ·{" "}
-                  {i.fat_g.toFixed(1)}g grasa ·{" "}
-                  {i.carbs_g.toFixed(1)}g carb
-                </li>
-              ))}
-            </ul>
-
-            <button
-              className="btn btn-secondary cerrar-modal"
-              onClick={() => setModalAbierto(false)}
-            >
-              {t("macro.closeButton")}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {cargandoMacros && !modalAbierto && (
-        <div className="modal-fondo">
-          <div
-            className="modal modal-loading"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="spinner" />
-            <p>{t("macro.loadingText")}</p>
-          </div>
-        </div>
-      )}
     </div>
+
+    <ChatBot />
+  </>
   );
 }
 
