@@ -350,7 +350,13 @@ Devuelve SOLO JSON válido con:
 Plato: "${plato}"
 `;
 
+    // 📌 LOG ANTES DE LLAMAR A GEMINI
+    console.log("Llamando a Gemini con prompt...");
+
     const ia = await usarGeminiComoJSON(prompt);
+
+    // 📌 LOG DE RESPUESTA
+    console.log("Respuesta IA (primeros 300 chars):", JSON.stringify(ia).slice(0, 300));
 
     if (!ia || typeof ia !== "object") {
       return res.status(500).json({ mensaje: "La IA no entregó un objeto válido" });
@@ -374,6 +380,9 @@ Plato: "${plato}"
       const nombreIng = ing.name_en.toLowerCase();
       const peso = ing.estimated_weight_g;
 
+      // 📌 LOG ANTES DE LLAMAR A NINJAS
+      console.log("Buscando macros en CalorieNinjas para:", nombreIng);
+
       // Cache ingrediente
       if (!cacheMacrosIng[nombreIng]) {
         const resp = await fetch(
@@ -385,7 +394,13 @@ Plato: "${plato}"
           }
         );
 
+        // 📌 LOG STATUS DE RESPUESTA
+        console.log("CalorieNinjas status:", resp.status);
+
         const data = await resp.json();
+
+        // 📌 LOG RESPUESTA PARCIAL
+        console.log("Respuesta CalorieNinjas:", JSON.stringify(data).slice(0, 200));
 
         if (!data.items || data.items.length === 0) {
           cacheMacrosIng[nombreIng] = null;
@@ -394,8 +409,8 @@ Plato: "${plato}"
           cacheMacrosIng[nombreIng] = {
             calories: base.calories || 0,
             protein_g: base.protein_g || 0,
-            fat_g: base.fat_total_g || 0, // ← CORREGIDO
-            carbs_g: base.carbohydrates_total_g || 0, // ← CORREGIDO
+            fat_g: base.fat_total_g || 0,
+            carbs_g: base.carbohydrates_total_g || 0,
           };
         }
       }
@@ -443,13 +458,22 @@ Plato: "${plato}"
     };
 
     cacheIA[plato] = final;
-
     return res.json(final);
+
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ mensaje: "Error en IA Nutrición" });
+    console.error("🔥 ERROR EN IA NUTRICIÓN >>>");
+    console.error("Mensaje:", err?.message);
+    console.error("Stack:", err?.stack);
+    console.error("Detalles respuesta API:", err?.response?.data);
+
+    return res.status(500).json({
+      mensaje: "Error en IA Nutrición",
+      detalle: err?.message,
+      apiResponse: err?.response?.data || null,
+    });
   }
 });
+
 
 
 // ================================================================
