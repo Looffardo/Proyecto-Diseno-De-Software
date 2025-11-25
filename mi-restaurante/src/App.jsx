@@ -10,7 +10,6 @@ import {
   crearPlato,
   actualizarPlato,
   eliminarPlato,
-  crearPedido,
 } from "./ApiClient";
 import { useI18n } from "./i18n/I18nProvider";
 import { Link } from "react-router-dom";
