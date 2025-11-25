@@ -10,7 +10,7 @@ require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
-const { GoogleGenAI } = require("@google/genai");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 
 const fetch =
@@ -50,9 +50,7 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
 const CALORIE_NINJAS_KEY = process.env.CALORIE_NINJAS_KEY || "";
 
 // Google Gemini
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Google OAuth
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
@@ -139,14 +137,17 @@ Estructura obligatoria:
 Plato: "${nombrePlato}"
 `;
 
-   const response = result.response;
+  // 👉 ESTA LÍNEA ES NUEVA: hace la llamada a Gemini
+  const result = await model.generateContent(prompt);
 
+  const response = result.response;
 
   const rawText = result.response?.text
     ? result.response.text()
     : String(result.response || "");
 
-  const text = response.text();
+  // 👉 AQUÍ SOLO CAMBIO const → let, para poder modificar text después
+  let text = response.text();
 
   // Limpia posible bloque ```json ... ```
   if (text.startsWith("```")) {
@@ -164,6 +165,7 @@ Plato: "${nombrePlato}"
     throw new Error("IA_JSON_INVALIDO");
   }
 }
+
 
 // ================================================================
 // ======================== RUTAS AUTENTICACIÓN ====================
