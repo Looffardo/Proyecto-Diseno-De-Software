@@ -314,7 +314,7 @@ const PLATOS_INICIALES = [
 function App() {
 const [platos, setPlatos] = useState([]);
 const [cargandoPlatos, setCargandoPlatos] = useState(true);
-const [errorPlatos, setErrorPlatos] = useState(null);
+const [errorPlatos, setErrorPlatos] = useState(false);
 const { lang, setLang, t } = useI18n();
 
 useEffect(() => {
@@ -324,7 +324,7 @@ useEffect(() => {
       setPlatos(data);
     } catch (err) {
       console.error(err);
-      setErrorPlatos("No se pudieron cargar los platos.");
+      setErrorPlatos(true);
     } finally {
       setCargandoPlatos(false);
     }
@@ -380,9 +380,9 @@ const [pedido, setPedido] = useState([]);
 
   const confirmarPedido = async () => {
   if (pedido.length === 0) {
-    alert("No hay platos en el pedido.");
-    return;
-  }
+  alert(t("app.alertEmptyOrder"));
+  return;
+}
 
   const items = pedido.map((p) => ({
     platoId: p.id || p._id,
@@ -401,9 +401,10 @@ const [pedido, setPedido] = useState([]);
     await crearPedido(payload);
     alert("Pedido guardado en la base de datos.");
     setPedido([]);
+
   } catch (err) {
     console.error(err);
-    alert("Error al guardar el pedido.");
+    alert(t("app.orderSaveError"));
   }
 };
 
@@ -458,9 +459,10 @@ const handleSubmit = async (e) => {
 
   const precioNum = Number(form.precio);
   if (Number.isNaN(precioNum) || precioNum <= 0) {
-    alert("El precio debe ser un número mayor a 0");
-    return;
+  alert(t("app.priceMustBePositive"));
+  return;
   }
+
 
   const ingredientesArray = form.ingredientesTexto
     .split(",")
@@ -499,7 +501,7 @@ const handleSubmit = async (e) => {
     limpiarFormulario();
   } catch (err) {
     console.error(err);
-    alert("Error al guardar el plato");
+    alert(t("app.dishSaveError"));
   }
 };
 
@@ -525,14 +527,14 @@ const handleEditar = (plato) => {
 
 
 const handleEliminar = async (id) => {
-  if (!confirm("¿Seguro que deseas eliminar este plato?")) return;
+  if (!confirm(t("app.confirmDeleteDish"))) return;
 
   try {
     await eliminarPlato(id);
     setPlatos((prev) => prev.filter((p) => p.id !== id && p._id !== id));
   } catch (err) {
     console.error(err);
-    alert("Error al eliminar el plato");
+    alert(t("app.dishDeleteError"));
   }
 };
 
@@ -546,7 +548,7 @@ const verMacros = async (plato) => {
     setModalAbierto(true);
   } catch (err) {
     console.error(err);
-    alert("Error obteniendo información nutricional.");
+    alert(t("app.macroError"));
   } finally {
     setCargandoMacros(false);
   }
@@ -585,29 +587,26 @@ useEffect(() => {
       <header className="header">
         <h1>{t("layout.appTitle")}</h1>
 
-        <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-          <label className="selector-idioma">
-            {t("layout.languageLabel")}{" "}
-            <select
-              value={lang}
-              onChange={(e) => setLang(e.target.value)}
-            >
-              <option value="es">{t("layout.spanish")}</option>
-              <option value="en">{t("layout.english")}</option>
-            </select>
-          </label>
-
+        <div className="header-controls">
           {usuario && (
-            <div>
-              <span style={{ marginRight: "1rem" }}>
-                {t("app.welcomeUser", {
-                  name: usuario.nombre || usuario.email,
-                })}
+            <>
+              <label className="selector-idioma">
+                {t("layout.languageLabel")}
+                <select value={lang} onChange={(e) => setLang(e.target.value)}>
+                  <option value="es">{t("layout.spanish")}</option>
+                  <option value="en">{t("layout.english")}</option>
+                </select>
+              </label> 
+              {usuario && (
+              <span className="usuario-conectado">
+                {t("app.connectedAs")} <strong>{usuario.nombre || usuario.email}</strong>
               </span>
+              )}
+
               <button className="btn secundario" onClick={handleLogout}>
                 {t("app.logout")}
               </button>
-            </div>
+            </>
           )}
         </div>
       </header>
@@ -620,23 +619,23 @@ useEffect(() => {
             <h2>{t("app.filtersTitle")}</h2>
             <input
               type="text"
-              placeholder="Buscar plato..."
+              placeholder={t("app.searchPlaceholder")}
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
             />
 
             <div className="filtros-linea">
               <label>
-                Tipo:
+                {t("app.filterTypeLabel")}
                 <select
                   value={tipo}
                   onChange={(e) => setTipo(e.target.value)}
                 >
-                  <option value="todos">Todos</option>
-                  <option value="entrada">Entrada</option>
-                  <option value="fondo">Plato de fondo</option>
-                  <option value="postre">Postre</option>
-                  <option value="bebida">Bebida</option>
+                  <option value="todos">{t("app.typeAll")}</option>
+                  <option value="entrada">{t("app.typeStarter")}</option>
+                  <option value="fondo">{t("app.typeMain")}</option>
+                  <option value="postre">{t("app.typeDessert")}</option>
+                  <option value="bebida">{t("app.typeDrink")}</option>
                 </select>
               </label>
 
@@ -646,7 +645,7 @@ useEffect(() => {
                   checked={soloFríos}
                   onChange={(e) => setSoloFríos(e.target.checked)}
                 />
-                Preparaciones frias
+                {t("app.filterCold")}
               </label>
 
               <label>
@@ -655,7 +654,7 @@ useEffect(() => {
                   checked={soloVeganos}
                   onChange={(e) => setSoloVeganos(e.target.checked)}
                 />
-                Apto para veganos
+                {t("app.filterVegan")}
               </label>
 
               <label>
@@ -664,7 +663,7 @@ useEffect(() => {
                   checked={soloPastas}
                   onChange={(e) => setSoloPastas(e.target.checked)}
                 />
-                Pastas
+                {t("app.filterPasta")}
               </label>
 
               <label>
@@ -673,7 +672,7 @@ useEffect(() => {
                   checked={soloMariscos}
                   onChange={(e) => setSoloMariscos(e.target.checked)}
                 />
-                Mariscos
+                {t("app.filterSeafood")}
               </label>
 
               <label>
@@ -682,7 +681,7 @@ useEffect(() => {
                   checked={soloAlcohol}
                   onChange={(e) => setSoloAlcohol(e.target.checked)}
                 />
-                Bebidas alcohólicas
+                {t("app.filterAlcohol")}
               </label>
 
               <label>
@@ -691,7 +690,7 @@ useEffect(() => {
                   checked={soloCarnes}
                   onChange={(e) => setSoloCarnes(e.target.checked)}
                 />
-                Carnes
+                {t("app.filterMeat")}
               </label>
 
               <label>
@@ -700,7 +699,7 @@ useEffect(() => {
                   checked={soloSandwitches}
                   onChange={(e) => setSoloSandwitches(e.target.checked)}
                 />
-                Sandwitches y/o Hamburguesas
+                {t("app.filterSandwiches")}
               </label>
             </div>
           </div>
@@ -708,11 +707,9 @@ useEffect(() => {
           <div className="card">
             <h2>{t("app.menuTitle")}</h2>
 
-            {cargandoPlatos && <p>Cargando platos...</p>}
-            {errorPlatos && <p style={{ color: "red" }}>{errorPlatos}</p>}
-
-            {!cargandoPlatos && platosFiltrados.length === 0 && (
-              <p>No se encontraron platos con esos filtros.</p>
+            {cargandoPlatos && <p>{t("app.loadingDishes")}</p>}
+            {errorPlatos && (
+              <p style={{ color: "red" }}>{t("app.errorLoadDishes")}</p>
             )}
 
             <div className="lista-platos">
@@ -752,21 +749,21 @@ useEffect(() => {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button className="btn" onClick={() => agregarAlPedido(plato)}>
-                        Añadir al pedido
+                        {t("app.addToOrder")}
                       </button>
 
                       <button
                         className="btn secundario"
                         onClick={() => handleEditar(plato)}
                       >
-                        Editar
+                        {t("app.edit")}
                       </button>
 
                       <button
                         className="btn peligro"
                         onClick={() => handleEliminar(platoId)}
                       >
-                        Eliminar
+                        {t("app.delete")}
                       </button>
 
                       <button
@@ -775,7 +772,7 @@ useEffect(() => {
                         style={{ marginTop: "0.3rem" }}
                         disabled={cargandoMacros}
                       >
-                        {cargandoMacros ? "Cargando..." : "Ver macros"}
+                        {cargandoMacros ? t("app.loading") : t("app.viewMacros")}
                       </button>
                     </div>
                   </article>
@@ -790,11 +787,11 @@ useEffect(() => {
         {/* Formulario + Pedido */}
         <section className="col lateral">
           <div className="card">
-            <h2>{editando ? "Editar plato" : "Nuevo plato"}</h2>
+            <h2>{editando ? t("app.editDishTitle") : t("app.newDishTitle")}</h2>
 
             <form onSubmit={handleSubmit} className="form-plato">
               <label>
-                Nombre
+                {t("app.fieldName")}
                 <input
                   name="nombre"
                   value={form.nombre}
@@ -804,7 +801,7 @@ useEffect(() => {
               </label>
 
               <label>
-                Descripción
+                {t("app.fieldDescription")}
                 <textarea
                   name="descripcion"
                   value={form.descripcion}
@@ -813,17 +810,18 @@ useEffect(() => {
               </label>
 
               <label>
-                Ingredientes (separados por coma)
+                {t("app.fieldIngredients")}
+
                 <textarea
                   name="ingredientesTexto"
                   value={form.ingredientesTexto}
                   onChange={handleChangeForm}
-                  placeholder="Ej: Tomate, Queso, Albahaca"
+                  placeholder={t("app.ingredientsPlaceholder")}
                 />
               </label>
 
               <label>
-                Precio
+                {t("app.fieldPrice")}
                 <input
                   name="precio"
                   type="number"
@@ -835,16 +833,16 @@ useEffect(() => {
               </label>
 
               <label>
-                Tipo
+                {t("app.fieldType")}
                 <select
                   name="tipo"
                   value={form.tipo}
                   onChange={handleChangeForm}
                 >
-                  <option value="entrada">Entrada</option>
-                  <option value="fondo">Plato de fondo</option>
-                  <option value="postre">Postre</option>
-                  <option value="bebida">Bebida</option>
+                  <option value="entrada">{t("app.typeStarter")}</option>
+                  <option value="fondo">{t("app.typeMain")}</option>
+                  <option value="postre">{t("app.typeDessert")}</option>
+                  <option value="bebida">{t("app.typeDrink")}</option>
                 </select>
               </label>
 
@@ -856,7 +854,7 @@ useEffect(() => {
                     checked={form.esFrio}
                     onChange={handleChangeForm}
                   />
-                  Preparaciones frias
+                  {t("app.filterCold")}
                 </label>
 
                 <label>
@@ -866,7 +864,7 @@ useEffect(() => {
                     checked={form.esVegano}
                     onChange={handleChangeForm}
                   />
-                  Apto para veganos
+                  {t("app.filterVegan")}
                 </label>
 
                 <label>
@@ -876,7 +874,7 @@ useEffect(() => {
                     checked={form.esPasta}
                     onChange={handleChangeForm}
                   />
-                  Pastas
+                  {t("app.filterPasta")}
                 </label>
 
                 <label>
@@ -886,7 +884,7 @@ useEffect(() => {
                     checked={form.esMarisco}
                     onChange={handleChangeForm}
                   />
-                  Mariscos
+                  {t("app.filterSeafood")}
                 </label>
 
                 <label>
@@ -896,7 +894,7 @@ useEffect(() => {
                     checked={form.esAlcohol}
                     onChange={handleChangeForm}
                   />
-                  Bebidas alcohólicas
+                  {t("app.filterAlcohol")}
                 </label>
 
                 <label>
@@ -906,7 +904,7 @@ useEffect(() => {
                     checked={form.esCarne}
                     onChange={handleChangeForm}
                   />
-                  Carnes
+                  {t("app.filterMeat")}
                 </label>
 
                 <label>
@@ -916,13 +914,13 @@ useEffect(() => {
                     checked={form.esSandwitch}
                     onChange={handleChangeForm}
                   />
-                  Sandwitches y/o Hamburguesas
+                  {t("app.filterSandwiches")}
                 </label>
               </div>
 
               <div className="form-acciones">
                 <button className="btn" type="submit">
-                  {editando ? "Guardar cambios" : "Crear plato"}
+                  {editando ? t("app.formSave") : t("app.formCreate")}
                 </button>
 
                 {editando && (
@@ -941,7 +939,7 @@ useEffect(() => {
           <div className="card">
             <h2>{t("app.orderSectionTitle")}</h2>
               {pedido.length === 0 ? (
-                <p>No has agregado nada al pedido.</p> 
+                <p>{t("app.emptyOrder")}</p>
               ) : (
                 <>
                   ...
@@ -961,42 +959,33 @@ useEffect(() => {
           {modalAbierto && macroData && (
   <div className="modal-fondo" onClick={() => setModalAbierto(false)}>
     <div className="modal" onClick={(e) => e.stopPropagation()}>
-      <h2>Información nutricional</h2>
+      <h2>{t("macro.title")}</h2>
 
-      <p><strong>Plato:</strong> {macroData.nombre_original}</p>
-      <p><strong>Traducción IA:</strong> {macroData.traduccion}</p>
+        <p>
+          <strong>{t("macro.dishLabel")} </strong>
+          {macroData.nombre_original}
+        </p>
+        <p>
+          <strong>{t("macro.translationLabel")} </strong>
+          {macroData.traduccion}
+        </p>
 
-      <h3>Totales</h3>
-      <div className="macro-totales">
-        <p><strong>Calorías:</strong> {macroData.total.calories} kcal</p>
-        <p><strong>Proteína:</strong> {macroData.total.protein_g} g</p>
-        <p><strong>Grasas:</strong> {macroData.total.fat_g} g</p>
-        <p><strong>Carbohidratos:</strong> {macroData.total.carbs_g} g</p>
-      </div>
-
-      <h3>Ingredientes analizados</h3>
-      <ul className="ingredientes-macro">
-        {macroData.ingredientes.map((i, idx) => (
-          <li key={idx}>
-            <strong>{i.name}</strong> — {i.weight_g}g  
-            <br />
-            {i.calories.toFixed(0)} kcal · {i.protein_g.toFixed(1)}g prot · {i.fat_g.toFixed(1)}g grasa · {i.carbs_g.toFixed(1)}g carb
-          </li>
-        ))}
-      </ul>
-
-      <button className="btn cerrar-modal" onClick={() => setModalAbierto(false)}>
-        Cerrar
-      </button>
-    </div>
-  </div>
-)}  
+        <h3>{t("macro.totalsTitle")}</h3>
+        ...
+        <h3>{t("macro.ingredientsTitle")}</h3>
+        ...
+        <button className="btn cerrar-modal" onClick={() => setModalAbierto(false)}>
+          {t("macro.closeButton")}
+        </button>
+            </div>
+          </div>
+        )}  
 
           {cargandoMacros && !modalAbierto && (
             <div className="modal-fondo">
               <div className="modal modal-loading" onClick={(e) => e.stopPropagation()}>
                 <div className="spinner" />
-                <p>Cargando información nutricional...</p>
+                <p>{t("macro.loadingText")}</p>
               </div>
             </div>
           )}
