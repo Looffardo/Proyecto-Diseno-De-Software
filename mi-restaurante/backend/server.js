@@ -232,6 +232,100 @@ app.post("/api/auth/login", (req, res) => {
   });
 });
 
+// ================================================================
+// ========================= RUTA CHATBOT ==========================
+// ================================================================
+const chatbotRouter = require("./rutas/chatbot");
+app.use("/api/chatbot", chatbotRouter);
+
+// ================================================================
+// ======================= CHATBOT GEMINI ==========================
+// ================================================================
+app.post("/api/chat-recomendador", authMiddleware, async (req, res) => {
+  try {
+    const { mensaje, platos } = req.body;
+
+    if (!mensaje) {
+      return res.status(400).json({ mensaje: "Falta el campo 'mensaje'" });
+    }
+
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(500).json({ mensaje: "GEMINI_API_KEY no configurada" });
+    }
+
+    // Preparamos contexto de platos (solo lo necesario)
+    const platosContexto = Array.isArray(platos)
+      ? platos.map((p) => ({
+          nombre: p.nombre,
+          descripcion: p.descripcion,
+          tipo: p.tipo,
+          esVegano: p.esVegano,
+          esMarisco: p.esMarisco,
+          esCarne: p.esCarne,
+          precio: p.precio,
+        }))
+      : [];
+
+    const prompt = `
+Eres el asistente de un restaurante. 
+
+Tienes esta carta en formato JSON:
+${JSON.stringify(platosContexto, null, 2)}
+
+El usuario dirá cosas como:
+- "quiero algo vegano"
+- "recomiéndame un plato con carne"
+- "tengo ganas de mariscos"
+- "quiero un postre liviano"
+- etc.
+
+Tu tarea:
+1. Entender la preferencia del usuario.
+2. Elegir 1 a 3 platos de la carta que encajen bien.
+3. Responder en español, en 1 a 3 frases naturales, mencionando los nombres exactos de los platos.
+4. No inventes platos que no existan en la carta JSON.
+5. Si no hay platos que encajen, dilo y ofrece alternativas generales.
+
+Mensaje del usuario: "${mensaje}"
+`;
+
+    const url =
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" +
+      process.env.GEMINI_API_KEY;
+
+    const geminiRes = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+      }),
+    });
+
+    const data = await geminiRes.json();
+
+    if (!geminiRes.ok) {
+      console.error("Error Gemini:", data);
+      return res
+        .status(500)
+        .json({ mensaje: "Error al llamar a Gemini para el chatbot" });
+    }
+
+    const textoRespuesta =
+      data.candidates?.[0]?.content?.parts
+        ?.map((p) => p.text || "")
+        .join("") || "Lo siento, no pude generar una recomendación ahora.";
+
+    return res.json({ respuesta: textoRespuesta });
+  } catch (err) {
+    console.error("Error en /api/chat-recomendador:", err);
+    return res
+      .status(500)
+      .json({ mensaje: "Error interno en el chatbot del restaurante" });
+  }
+});
+
 // Login con Google
 app.post("/api/auth/google", async (req, res) => {
   try {
@@ -296,212 +390,7 @@ app.get("/api/auth/profile", authMiddleware, (req, res) => {
   });
 });
 
-// ================================================================
-// =========================== NUTRICIÓN ============================
-// ================================================================
 
-// /api/nutricion
-app.get("/api/nutricion", async (req, res) => {
-  try {
-    const query = req.query.q?.toLowerCase();
-    if (!query)
-      return res.status(400).json({ mensaje: "Falta parámetro q" });
-
-    const traducciones = {
-      "camarones apanados": "breaded shrimp",
-      "ostiones a la parmesana": "scallops parmesan",
-      "ensalada césar": "caesar salad",
-      "ensalada caprese": "caprese salad",
-      "crema de zapallo": "pumpkin soup",
-      locos: "abalone",
-      falafel: "falafel",
-      gyosas: "dumplings",
-      "hamburguesa clásica": "beef burger",
-      "barros luco": "beef cheese sandwich",
-      "bistec a lo pobre": "steak with fries",
-      "milanesa de pollo napolitana": "chicken milanesa napolitana",
-      "bagel de salmón ahumado": "smoked salmon bagel",
-    };
-
-    const textoEn = traducciones[query] || query;
-
-    if (cacheMacrosPlato[textoEn]) {
-      console.log("CACHE PLATO HIT:", textoEn);
-      return res.json(cacheMacrosPlato[textoEn]);
-    }
-
-    console.log("API CALL PLATO:", textoEn);
-
-    const response = await fetch(
-      `https://api.calorieninjas.com/v1/nutrition?query=${encodeURIComponent(
-        textoEn
-      )}`,
-      {
-        headers: { "X-Api-Key": CALORIE_NINJAS_KEY },
-      }
-    );
-
-    const data = await response.json();
-
-    cacheMacrosPlato[textoEn] = data;
-
-    return res.json(data);
-  } catch (err) {
-    return res.status(500).json({ mensaje: "Error Nutrición" });
-  }
-});
-
-// ================================================================
-// =========================== IA NUTRICIÓN =========================
-// ================================================================
-app.get("/api/nutricion", async (req, res) => {
-  try {
-    const plato = req.query.q;
-    if (!plato) {
-      return res.status(400).json({ mensaje: "Falta parámetro q" });
-    }
-
-    // Cache simple por nombre de plato
-    if (cacheIA[plato]) {
-      console.log("CACHE IA HIT:", plato);
-      return res.json(cacheIA[plato]);
-    }
-
-    console.log("IA CALL:", plato);
-
-    // 1) Pedimos a Gemini traducción + estimación de ingredientes
-    const prompt = `
-Eres un nutricionista experto.
-
-Para el plato "${plato}", devuelve SOLO JSON válido con este formato EXACTO:
-
-{
-  "english_name": "traducción del nombre del plato al inglés",
-  "ingredients": [
-    {
-      "name_en": "nombre del ingrediente en inglés (ej: chicken breast, rice, olive oil)",
-      "estimated_weight_g": 120
-    }
-  ]
-}
-
-Reglas importantes:
-- estimated_weight_g siempre en gramos (número, sin texto).
-- La suma de los pesos de los ingredientes debe aproximarse al peso total típico de una porción normal de ese plato.
-- No expliques nada, no agregues texto fuera del JSON.
-`;
-
-    const ia = await usarGeminiComoJSON(prompt);
-
-    // Validar estructura mínima
-    if (!ia || typeof ia !== "object") {
-      return res.status(500).json({ mensaje: "La IA no entregó un objeto válido" });
-    }
-
-    if (!Array.isArray(ia.ingredients) || ia.ingredients.length === 0) {
-      return res.status(500).json({
-        mensaje: "La IA no entregó ingredientes válidos",
-        detalle: ia,
-      });
-    }
-
-    // 2) Para cada ingrediente, preguntamos a CalorieNinjas
-    const resultados = [];
-    const total = { calories: 0, protein_g: 0, fat_g: 0, carbs_g: 0 };
-
-    for (const ing of ia.ingredients) {
-      if (!ing || !ing.name_en || !ing.estimated_weight_g) {
-        continue;
-      }
-
-      const nombreIng = String(ing.name_en).toLowerCase();
-      const peso = Number(ing.estimated_weight_g);
-
-      if (!peso || peso <= 0) {
-        continue;
-      }
-
-      // Query tipo "120g chicken breast"
-      const queryStr = `${peso}g ${nombreIng}`;
-
-      // Cache por combinación nombre+peso
-      const cacheKey = `${nombreIng}__${peso}`;
-      if (!cacheMacrosIng[cacheKey]) {
-        console.log("API CALORIE NINJAS:", queryStr);
-
-        const resp = await fetch(
-          `https://api.calorieninjas.com/v1/nutrition?query=${encodeURIComponent(
-            queryStr
-          )}`,
-          {
-            headers: { "X-Api-Key": CALORIE_NINJAS_KEY },
-          }
-        );
-
-        const data = await resp.json();
-
-        if (!data.items || data.items.length === 0) {
-          cacheMacrosIng[cacheKey] = null;
-        } else {
-          const item = data.items[0];
-          cacheMacrosIng[cacheKey] = {
-            calories: item.calories || 0,
-            protein_g: item.protein_g || 0,
-            fat_g: item.fat_total_g || 0,
-            carbs_g: item.carbohydrates_total_g || 0,
-          };
-        }
-      }
-
-      const base = cacheMacrosIng[cacheKey];
-
-      // Si no hay datos, igual devolvemos el ingrediente con 0s
-      if (!base) {
-        resultados.push({
-          name: ing.name_en,
-          weight_g: peso,
-          calories: 0,
-          protein_g: 0,
-          fat_g: 0,
-          carbs_g: 0,
-        });
-        continue;
-      }
-
-      resultados.push({
-        name: ing.name_en,
-        weight_g: peso,
-        calories: base.calories,
-        protein_g: base.protein_g,
-        fat_g: base.fat_g,
-        carbs_g: base.carbs_g,
-      });
-
-      total.calories += base.calories;
-      total.protein_g += base.protein_g;
-      total.fat_g += base.fat_g;
-      total.carbs_g += base.carbs_g;
-    }
-
-    const final = {
-      nombre_original: plato,
-      traduccion: ia.english_name || plato,
-      ingredientes: resultados,
-      total: {
-        calories: Math.round(total.calories),
-        protein_g: Number(total.protein_g.toFixed(1)),
-        fat_g: Number(total.fat_g.toFixed(1)),
-        carbs_g: Number(total.carbs_g.toFixed(1)),
-      },
-    };
-
-    cacheIA[plato] = final;
-    return res.json(final);
-  } catch (err) {
-    console.error("Error en /api/nutricion:", err);
-    return res.status(500).json({ mensaje: "Error en IA Nutrición" });
-  }
-});
 
 
 

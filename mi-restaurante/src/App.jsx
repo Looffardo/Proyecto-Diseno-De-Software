@@ -708,7 +708,7 @@ function App() {
 </main>
     </div>
 
-    <ChatBot />
+    <ChatBot platos={platos}/>
   </>
   );
 }
