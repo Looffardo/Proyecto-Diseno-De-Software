@@ -180,6 +180,7 @@ app.post("/api/auth/register", (req, res) => {
     return res.status(409).json({ mensaje: "Ese correo ya está registrado" });
   }
 
+  //Cifrado de contraseña
   const passwordHash = bcrypt.hashSync(password, 10);
 
   const nuevoUsuario = {
