@@ -23,8 +23,8 @@ const PORT = process.env.PORT || 4000;
 
 
 // MongoDB
-mongoose
-  .connect("mongodb://127.0.0.1:27017/restaurante")
+
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Conectado a MongoDB"))
   .catch((err) => console.error("❌ Error conectando a MongoDB", err));
 
