@@ -12,7 +12,7 @@ import {
   eliminarPlato,
   crearPedido,
 } from "./ApiClient";
-
+import { useI18n } from "./i18n/I18nProvider";
 
 
 
@@ -956,34 +956,46 @@ useEffect(() => {
     <div className="modal" onClick={(e) => e.stopPropagation()}>
       <h2>{t("macro.title")}</h2>
 
-        <p>
-          <strong>{t("macro.dishLabel")} </strong>
-          {macroData.nombre_original}
-        </p>
-        <p>
-          <strong>{t("macro.translationLabel")} </strong>
-          {macroData.traduccion}
-        </p>
+      <p>
+        <strong>{t("macro.dishLabel")} </strong>
+        {macroData.nombre_original}
+      </p>
+      <p>
+        <strong>{t("macro.translationLabel")} </strong>
+        {macroData.traduccion}
+      </p>
 
-        <h3>{t("macro.totalsTitle")}</h3>
-        ...
-        <h3>{t("macro.ingredientsTitle")}</h3>
-        ...
-        <button className="btn cerrar-modal" onClick={() => setModalAbierto(false)}>
-          {t("macro.closeButton")}
-        </button>
-            </div>
-          </div>
-        )}  
+      <h3>{t("macro.totalsTitle")}</h3>
+      <div className="macro-totales">
+        <p><strong>Calorías:</strong> {macroData.total.calories} kcal</p>
+        <p><strong>Proteína:</strong> {macroData.total.protein_g} g</p>
+        <p><strong>Grasas:</strong> {macroData.total.fat_g} g</p>
+        <p><strong>Carbohidratos:</strong> {macroData.total.carbs_g} g</p>
+      </div>
 
-          {cargandoMacros && !modalAbierto && (
-            <div className="modal-fondo">
-              <div className="modal modal-loading" onClick={(e) => e.stopPropagation()}>
-                <div className="spinner" />
-                <p>{t("macro.loadingText")}</p>
-              </div>
-            </div>
-          )}
+      <h3>{t("macro.ingredientsTitle")}</h3>
+      <ul className="ingredientes-macro">
+        {macroData.ingredientes.map((i, idx) => (
+          <li key={idx}>
+            <strong>{i.name}</strong> — {i.weight_g}g
+            <br />
+            {i.calories.toFixed(0)} kcal ·{" "}
+            {i.protein_g.toFixed(1)}g prot ·{" "}
+            {i.fat_g.toFixed(1)}g grasa ·{" "}
+            {i.carbs_g.toFixed(1)}g carb
+          </li>
+        ))}
+      </ul>
+
+      <button
+        className="btn cerrar-modal"
+        onClick={() => setModalAbierto(false)}
+      >
+        {t("macro.closeButton")}
+      </button>
+    </div>
+  </div>
+)}
 
 
     </div>
