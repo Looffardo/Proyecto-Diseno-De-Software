@@ -18,7 +18,6 @@ import { Link } from "react-router-dom";
 // Lógica central de la app
 function App() {
 
-
   const [platos, setPlatos] = useState([]);
   const [cargandoPlatos, setCargandoPlatos] = useState(true);
   const [errorPlatos, setErrorPlatos] = useState(false);
