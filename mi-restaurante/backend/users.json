@@ -5,5 +5,12 @@
     "nombre": "Christian Looff",
     "passwordHash": null,
     "viaGoogle": true
+  },
+  {
+    "id": "google-102562692617487707688",
+    "email": "valenmalov@gmail.com",
+    "nombre": "Valen Malov",
+    "passwordHash": null,
+    "viaGoogle": true
   }
 ]
