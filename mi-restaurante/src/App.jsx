@@ -473,7 +473,7 @@ function App() {
                         to="/pedidos"
                         className="btn btn-primary btn-sm"
                       >
-                        Ir a pedidos
+                        {t("app.goOrder")}
                       </Link>
 
                       <button
