@@ -1,0 +1,34 @@
+{
+  "layout": {
+    "appTitle": "My Smart Restaurant",
+    "languageLabel": "Language",
+    "spanish": "Spanish",
+    "english": "English"
+  },
+  "auth": {
+    "titleLogin": "Log in",
+    "titleRegister": "Create account",
+    "loginButton": "Log in",
+    "registerButton": "Sign up",
+    "orContinueWithGoogle": "Or continue with Google:",
+    "invalidEmail": "Please enter a valid email (e.g., user@domain.com).",
+    "passwordTooShort": "Password must have at least 8 characters.",
+    "passwordUpper": "Must include at least 1 uppercase letter.",
+    "passwordNumber": "Must include at least 1 number.",
+    "passwordSpecial": "Must include at least 1 special symbol.",
+    "nameLabel": "Name",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "haveAccount": "Already have an account?",
+    "noAccount": "Don't have an account?"
+  },
+  "app": {
+    "welcomeUser": "Hi, {{name}}",
+    "logout": "Log out",
+    "menuTitle": "Restaurant menu",
+    "filtersTitle": "Filters",
+    "orderSectionTitle": "Your order",
+    "confirmOrder": "Confirm order",
+    "totalLabel": "Total"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "layout": {
+    "appTitle": "Mi Restaurante Inteligente",
+    "languageLabel": "Idioma",
+    "spanish": "Español",
+    "english": "Inglés"
+  },
+  "auth": {
+    "titleLogin": "Iniciar sesión",
+    "titleRegister": "Crear cuenta",
+    "loginButton": "Ingresar",
+    "registerButton": "Registrarse",
+    "orContinueWithGoogle": "O continuar con Google:",
+    "invalidEmail": "Por favor ingresa un email válido (ej: usuario@dominio.com).",
+    "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
+    "passwordUpper": "Debe incluir al menos 1 letra mayúscula.",
+    "passwordNumber": "Debe incluir al menos 1 número.",
+    "passwordSpecial": "Debe incluir al menos 1 símbolo especial.",
+    "nameLabel": "Nombre",
+    "emailLabel": "Email",
+    "passwordLabel": "Contraseña",
+    "haveAccount": "¿Ya tienes cuenta?",
+    "noAccount": "¿No tienes cuenta?"
+  },
+  "app": {
+    "welcomeUser": "Hola, {{name}}",
+    "logout": "Cerrar sesión",
+    "menuTitle": "Menú del restaurante",
+    "filtersTitle": "Filtros",
+    "orderSectionTitle": "Tu pedido",
+    "confirmOrder": "Confirmar pedido",
+    "totalLabel": "Total"
+  }
+}

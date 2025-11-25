@@ -2,57 +2,59 @@
 import { useState } from 'react';
 import { apiRequest, setToken } from './ApiClient';
 import { GoogleLogin } from '@react-oauth/google';
+import { useI18n } from './i18n/I18nProvider';
 
 // === VALIDADORES ===
+// Devuelven "códigos" que luego se traducen con t()
 function validarPassword(password) {
   const tieneMayuscula = /[A-Z]/.test(password);
   const tieneNumero = /[0-9]/.test(password);
   const tieneEspecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
   const tieneLargo = password.length >= 8;
 
-  if (!tieneLargo) return 'La contraseña debe tener al menos 8 caracteres.';
-  if (!tieneMayuscula) return 'Debe incluir al menos 1 letra mayúscula.';
-  if (!tieneNumero) return 'Debe incluir al menos 1 número.';
-  if (!tieneEspecial) return 'Debe incluir al menos 1 símbolo especial.';
-
+  if (!tieneLargo) return 'passwordTooShort';
+  if (!tieneMayuscula) return 'passwordUpper';
+  if (!tieneNumero) return 'passwordNumber';
+  if (!tieneEspecial) return 'passwordSpecial';
   return null;
 }
 
 function validarEmail(email) {
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return regex.test(email);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-// ==========================
-// COMPONENTE PRINCIPAL
-// ==========================
-export default function Auth({ onAuth }) {
-  const [modo, setModo] = useState('login');
+function Auth({ onAuth }) {
+  const { t } = useI18n();
+
+  const [modo, setModo] = useState('login'); // 'login' | 'register'
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [cargando, setCargando] = useState(false);
 
-  // === GOOGLE LOGIN ===
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const credential = credentialResponse.credential;
+      setError(null);
+      setCargando(true);
 
       const data = await apiRequest('/api/auth/google', {
         method: 'POST',
-        body: { credential },
+        body: { credential: credentialResponse.credential },
       });
 
       setToken(data.token);
       onAuth(data.usuario);
     } catch (err) {
-      setError('Error al iniciar con Google');
+      console.error(err);
+      setError(t('auth.googleError') || 'Error al iniciar con Google');
+    } finally {
+      setCargando(false);
     }
   };
 
   const handleGoogleError = () => {
-    setError('Error al iniciar con Google');
+    setError(t('auth.googleError') || 'Error al iniciar con Google');
   };
 
   // === LOGIN / REGISTRO NORMAL ===
@@ -63,16 +65,16 @@ export default function Auth({ onAuth }) {
 
     // Validación email
     if (!validarEmail(email)) {
-      setError('Por favor ingresa un email válido (ej: usuario@dominio.com).');
+      setError(t('auth.invalidEmail'));
       setCargando(false);
       return;
     }
 
     // Validación password solo en registro
     if (modo === 'register') {
-      const errorPass = validarPassword(password);
-      if (errorPass) {
-        setError(errorPass);
+      const codigoError = validarPassword(password);
+      if (codigoError) {
+        setError(t(`auth.${codigoError}`));
         setCargando(false);
         return;
       }
@@ -93,56 +95,27 @@ export default function Auth({ onAuth }) {
       setToken(data.token);
       onAuth(data.usuario);
     } catch (err) {
-      setError(err.message);
+      console.error(err);
+      setError(err.message || 'Error al autenticar');
     } finally {
       setCargando(false);
     }
   };
 
-  // ==========================
-  // RENDER
-  // ==========================
   return (
-    <div className="card" style={{ maxWidth: 400, margin: '2rem auto' }}>
-      <h2>{modo === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}</h2>
+    <div className="auth-card">
+      <h2>
+        {modo === 'login'
+          ? t('auth.titleLogin')
+          : t('auth.titleRegister')}
+      </h2>
 
-      {/* BOTONES MODO */}
-      <div style={{ marginBottom: '1rem' }}>
-        <button
-          className="btn secundario"
-          type="button"
-          onClick={() => {
-            setModo('login');
-            setNombre('');
-            setEmail('');
-            setPassword('');
-            setError(null);
-          }}
-        >
-          Login
-        </button>
-
-        <button
-          className="btn secundario"
-          type="button"
-          onClick={() => {
-            setModo('register');
-            setNombre('');
-            setEmail('');
-            setPassword('');
-            setError(null);
-          }}
-        >
-          Registrarse
-        </button>
-      </div>
-
-      {/* FORMULARIO NORMAL */}
-      <form onSubmit={handleSubmit} className="form-plato">
+      <form onSubmit={handleSubmit} className="auth-form">
         {modo === 'register' && (
           <label>
-            Nombre
+            {t('auth.nameLabel')}
             <input
+              type="text"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               required
@@ -151,7 +124,7 @@ export default function Auth({ onAuth }) {
         )}
 
         <label>
-          Email
+          {t('auth.emailLabel')}
           <input
             type="email"
             value={email}
@@ -161,7 +134,7 @@ export default function Auth({ onAuth }) {
         </label>
 
         <label>
-          Contraseña
+          {t('auth.passwordLabel')}
           <input
             type="password"
             value={password}
@@ -176,14 +149,29 @@ export default function Auth({ onAuth }) {
           {cargando
             ? 'Procesando...'
             : modo === 'login'
-              ? 'Entrar'
-              : 'Registrarme'}
+              ? t('auth.loginButton')
+              : t('auth.registerButton')}
+        </button>
+
+        <button
+          className="btn secundario"
+          type="button"
+          onClick={() => {
+            setModo(modo === 'login' ? 'register' : 'login');
+            setNombre('');
+            setPassword('');
+            setError(null);
+          }}
+        >
+          {modo === 'login'
+            ? t('auth.noAccount')
+            : t('auth.haveAccount')}
         </button>
       </form>
 
       {/* SECCIÓN GOOGLE */}
       <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-        <p>O continuar con Google:</p>
+        <p>{t('auth.orContinueWithGoogle')}</p>
         <GoogleLogin
           onSuccess={handleGoogleSuccess}
           onError={handleGoogleError}
@@ -192,3 +180,5 @@ export default function Auth({ onAuth }) {
     </div>
   );
 }
+
+export default Auth;
