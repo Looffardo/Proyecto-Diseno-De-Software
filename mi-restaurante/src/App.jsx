@@ -315,12 +315,8 @@ function App() {
 
 const [platos, setPlatos] = useState([]);
 const [cargandoPlatos, setCargandoPlatos] = useState(true);
-<<<<<<< HEAD
-const [errorPlatos, setErrorPlatos] = useState(null);
-=======
 const [errorPlatos, setErrorPlatos] = useState(false);
 const { lang, setLang, t } = useI18n();
->>>>>>> b8478ea9b0a46d1a722987b80d4a0a01bd64ad50
 
 useEffect(() => {
   async function fetchPlatos() {
@@ -590,7 +586,6 @@ useEffect(() => {
   return (
     <div className="app">
       <header className="header">
-<<<<<<< HEAD
         <h1>Restaurante "Nombre Restaurante"</h1>
         {usuario && (
           <div>
@@ -602,32 +597,6 @@ useEffect(() => {
             </button>
           </div>
         )}
-=======
-        <h1>{t("layout.appTitle")}</h1>
-
-        <div className="header-controls">
-          {usuario && (
-            <>
-              <label className="selector-idioma">
-                {t("layout.languageLabel")}
-                <select value={lang} onChange={(e) => setLang(e.target.value)}>
-                  <option value="es">{t("layout.spanish")}</option>
-                  <option value="en">{t("layout.english")}</option>
-                </select>
-              </label> 
-              {usuario && (
-              <span className="usuario-conectado">
-                {t("app.connectedAs")} <strong>{usuario.nombre || usuario.email}</strong>
-              </span>
-              )}
-
-              <button className="btn secundario" onClick={handleLogout}>
-                {t("app.logout")}
-              </button>
-            </>
-          )}
-        </div>
->>>>>>> b8478ea9b0a46d1a722987b80d4a0a01bd64ad50
       </header>
       <main className="layout">
         
@@ -955,22 +924,10 @@ useEffect(() => {
           </div>
 
           <div className="card">
-<<<<<<< HEAD
-            <h2>Pedido</h2>
-=======
             <h2>{t("app.orderSectionTitle")}</h2>
-              {pedido.length === 0 ? (
-                <p>{t("app.emptyOrder")}</p>
-              ) : (
-                <>
-                  ...
-                  <p className="total">
-                    {t("app.totalLabel")}: ${totalPedido.toLocaleString("es-CL")}
-                  </p>
->>>>>>> b8478ea9b0a46d1a722987b80d4a0a01bd64ad50
 
             {pedido.length === 0 ? (
-              <p>No has agregado nada al pedido.</p>
+              <p>{t("app.emptyOrder")}</p>
             ) : (
               <>
                 <ul className="lista-pedido">
@@ -982,15 +939,16 @@ useEffect(() => {
                 </ul>
 
                 <p className="total">
-                  Total: ${totalPedido.toLocaleString("es-CL")}
+                  {t("app.totalLabel")}: ${totalPedido.toLocaleString("es-CL")}
                 </p>
 
                 <button className="btn" type="button" onClick={confirmarPedido}>
-                  Confirmar pedido
+                  {t("app.confirmOrder")}
                 </button>
               </>
             )}
           </div>
+
         </section>
       </main>
           {modalAbierto && macroData && (
