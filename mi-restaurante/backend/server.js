@@ -352,22 +352,16 @@ app.get("/api/nutricion", async (req, res) => {
 });
 
 // ================================================================
-// =========================== IA NUTRICIÓN ========================
+// =========================== IA NUTRICIÓN =========================
 // ================================================================
 app.get("/api/ia-nutricion", async (req, res) => {
   try {
-    const plato = (req.query.q || "").trim();
+    const plato = req.query.q;
     if (!plato) {
       return res.status(400).json({ mensaje: "Falta parámetro q" });
     }
 
-    if (!CALORIE_NINJAS_KEY) {
-      return res
-        .status(500)
-        .json({ mensaje: "CALORIE_NINJAS_KEY no configurada" });
-    }
-
-    // 0) Cache por plato
+    // Cache simple por nombre de plato
     if (cacheIA[plato]) {
       console.log("CACHE IA HIT:", plato);
       return res.json(cacheIA[plato]);
@@ -375,86 +369,96 @@ app.get("/api/ia-nutricion", async (req, res) => {
 
     console.log("IA CALL:", plato);
 
-    // 1) Pedir a Gemini la descomposición del plato
-    const ia = await usarGeminiComoJSON(plato);
+    // 1) Pedimos a Gemini traducción + estimación de ingredientes
+    const prompt = `
+Eres un nutricionista experto.
 
+Para el plato "${plato}", devuelve SOLO JSON válido con este formato EXACTO:
+
+{
+  "english_name": "traducción del nombre del plato al inglés",
+  "ingredients": [
+    {
+      "name_en": "nombre del ingrediente en inglés (ej: chicken breast, rice, olive oil)",
+      "estimated_weight_g": 120
+    }
+  ]
+}
+
+Reglas importantes:
+- estimated_weight_g siempre en gramos (número, sin texto).
+- La suma de los pesos de los ingredientes debe aproximarse al peso total típico de una porción normal de ese plato.
+- No expliques nada, no agregues texto fuera del JSON.
+`;
+
+    const ia = await usarGeminiComoJSON(prompt);
+
+    // Validar estructura mínima
     if (!ia || typeof ia !== "object") {
-      return res
-        .status(500)
-        .json({ mensaje: "La IA no entregó un objeto válido" });
+      return res.status(500).json({ mensaje: "La IA no entregó un objeto válido" });
     }
 
-    const ingredientesGemini = Array.isArray(ia.ingredients)
-      ? ia.ingredients
-      : [];
-
-    if (ingredientesGemini.length === 0) {
+    if (!Array.isArray(ia.ingredients) || ia.ingredients.length === 0) {
       return res.status(500).json({
         mensaje: "La IA no entregó ingredientes válidos",
         detalle: ia,
       });
     }
 
-    // 2) Consultar CalorieNinjas por cada ingrediente
+    // 2) Para cada ingrediente, preguntamos a CalorieNinjas
     const resultados = [];
     const total = { calories: 0, protein_g: 0, fat_g: 0, carbs_g: 0 };
 
-    for (const ing of ingredientesGemini) {
-      if (!ing) continue;
-
-      const nameEn = String(ing.name_en || "").trim();
-      const peso = Number(ing.estimated_weight_g);
-
-      if (!nameEn || !Number.isFinite(peso) || peso <= 0) {
+    for (const ing of ia.ingredients) {
+      if (!ing || !ing.name_en || !ing.estimated_weight_g) {
         continue;
       }
 
-      const clave = nameEn.toLowerCase();
+      const nombreIng = String(ing.name_en).toLowerCase();
+      const peso = Number(ing.estimated_weight_g);
 
-      // 2A) Consultar o usar cache de ingrediente
-      if (!cacheMacrosIng[clave]) {
-        console.log("CalorieNinjas CALL:", clave);
+      if (!peso || peso <= 0) {
+        continue;
+      }
+
+      // Query tipo "120g chicken breast"
+      const queryStr = `${peso}g ${nombreIng}`;
+
+      // Cache por combinación nombre+peso
+      const cacheKey = `${nombreIng}__${peso}`;
+      if (!cacheMacrosIng[cacheKey]) {
+        console.log("API CALORIE NINJAS:", queryStr);
 
         const resp = await fetch(
           `https://api.calorieninjas.com/v1/nutrition?query=${encodeURIComponent(
-            clave
+            queryStr
           )}`,
           {
             headers: { "X-Api-Key": CALORIE_NINJAS_KEY },
           }
         );
 
-        if (!resp.ok) {
-          const txt = await resp.text().catch(() => "");
-          console.error(
-            "Error CalorieNinjas",
-            resp.status,
-            resp.statusText,
-            txt
-          );
-          cacheMacrosIng[clave] = null;
+        const data = await resp.json();
+
+        if (!data.items || data.items.length === 0) {
+          cacheMacrosIng[cacheKey] = null;
         } else {
-          const data = await resp.json();
-          if (!data.items || data.items.length === 0) {
-            cacheMacrosIng[clave] = null;
-          } else {
-            const base = data.items[0];
-            cacheMacrosIng[clave] = {
-              calories: base.calories || 0,
-              protein_g: base.protein_g || 0,
-              fat_g: base.fat_total_g || 0,
-              carbs_g: base.carbohydrates_total_g || 0,
-            };
-          }
+          const item = data.items[0];
+          cacheMacrosIng[cacheKey] = {
+            calories: item.calories || 0,
+            protein_g: item.protein_g || 0,
+            fat_g: item.fat_total_g || 0,
+            carbs_g: item.carbohydrates_total_g || 0,
+          };
         }
       }
 
-      const base = cacheMacrosIng[clave];
+      const base = cacheMacrosIng[cacheKey];
 
-      // Si no hay datos para ese ingrediente, lo marcamos con 0 pero igual lo mostramos
+      // Si no hay datos, igual devolvemos el ingrediente con 0s
       if (!base) {
         resultados.push({
-          name: nameEn,
+          name: ing.name_en,
           weight_g: peso,
           calories: 0,
           protein_g: 0,
@@ -464,28 +468,24 @@ app.get("/api/ia-nutricion", async (req, res) => {
         continue;
       }
 
-      const factor = peso / 100;
-
-      const item = {
-        name: nameEn,
+      resultados.push({
+        name: ing.name_en,
         weight_g: peso,
-        calories: base.calories * factor,
-        protein_g: base.protein_g * factor,
-        fat_g: base.fat_g * factor,
-        carbs_g: base.carbs_g * factor,
-      };
+        calories: base.calories,
+        protein_g: base.protein_g,
+        fat_g: base.fat_g,
+        carbs_g: base.carbs_g,
+      });
 
-      resultados.push(item);
-
-      total.calories += item.calories;
-      total.protein_g += item.protein_g;
-      total.fat_g += item.fat_g;
-      total.carbs_g += item.carbs_g;
+      total.calories += base.calories;
+      total.protein_g += base.protein_g;
+      total.fat_g += base.fat_g;
+      total.carbs_g += base.carbs_g;
     }
 
     const final = {
       nombre_original: plato,
-      traduccion: ia.english_name,
+      traduccion: ia.english_name || plato,
       ingredientes: resultados,
       total: {
         calories: Math.round(total.calories),
@@ -498,7 +498,7 @@ app.get("/api/ia-nutricion", async (req, res) => {
     cacheIA[plato] = final;
     return res.json(final);
   } catch (err) {
-    console.error("Error en IA Nutrición:", err);
+    console.error("Error en /api/ia-nutricion:", err);
     return res.status(500).json({ mensaje: "Error en IA Nutrición" });
   }
 });
