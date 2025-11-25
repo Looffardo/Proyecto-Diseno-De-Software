@@ -862,16 +862,12 @@ function App() {
                 return (
                   <div className="col" key={platoId}>
                     <article
-                      className={`plato ${
-                        abierto ? "plato-abierto" : ""
-                      } h-100`}
+                      className={`plato ${abierto ? "plato-abierto" : ""} h-100`}
                       onClick={() =>
-                        setPlatoActivoId((prev) =>
-                          prev === platoId ? null : platoId
-                        )
+                        setPlatoActivoId((prev) => (prev === platoId ? null : platoId))
                       }
                     >
-                      <div className="plato-contenido">
+                      <div className="plato-contenido d-flex flex-column h-100">
                         <div className="plato-header d-flex justify-content-between align-items-start">
                           <h3 className="h6 mb-1">{plato.nombre}</h3>
                           <p className="precio mb-0">
@@ -879,9 +875,7 @@ function App() {
                           </p>
                         </div>
 
-                        <p className="descripcion mb-2">
-                          {plato.descripcion}
-                        </p>
+                        <p className="descripcion mb-2">{plato.descripcion}</p>
 
                         {abierto &&
                           plato.ingredientes &&
@@ -892,46 +886,45 @@ function App() {
                               ))}
                             </ul>
                           )}
-                      </div>
 
-                      <div
-                        className="acciones-plato d-flex flex-column gap-2 mt-2"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <button
-                          className="btn-custom btn-primary-custom btn-small"
-                          onClick={() => agregarAlPedido(plato)}
+                        <div
+                          className="acciones-plato d-flex flex-column gap-2 mt-2"
+                          onClick={(e) => e.stopPropagation()}
                         >
-                          {t("app.addToOrder")}
-                        </button>
+                          <button
+                            className="btn-custom btn-primary-custom btn-small"
+                            onClick={() => agregarAlPedido(plato)}
+                          >
+                            {t("app.addToOrder")}
+                          </button>
 
-                        <button
-                          className="btn btn-outline-secondary btn-sm"
-                          onClick={() => handleEditar(plato)}
-                        >
-                          {t("app.edit")}
-                        </button>
+                          <button
+                            className="btn btn-outline-secondary btn-sm"
+                            onClick={() => handleEditar(plato)}
+                          >
+                            {t("app.edit")}
+                          </button>
 
-                        <button
-                          className="btn btn-danger btn-sm"
-                          onClick={() => handleEliminar(platoId)}
-                        >
-                          {t("app.delete")}
-                        </button>
+                          <button
+                            className="btn btn-danger btn-sm"
+                            onClick={() => handleEliminar(platoId)}
+                          >
+                            {t("app.delete")}
+                          </button>
 
-                        <button
-                          className="btn btn-outline-primary btn-sm"
-                          onClick={() => verMacros(plato)}
-                          style={{ marginTop: "0.3rem" }}
-                          disabled={cargandoMacros}
-                        >
-                          {cargandoMacros
-                            ? t("app.loading")
-                            : t("app.viewMacros")}
-                        </button>
+                          <button
+                            className="btn btn-outline-primary btn-sm"
+                            onClick={() => verMacros(plato)}
+                            style={{ marginTop: "0.3rem" }}
+                            disabled={cargandoMacros}
+                          >
+                            {cargandoMacros ? t("app.loading") : t("app.viewMacros")}
+                          </button>
+                        </div>
                       </div>
                     </article>
                   </div>
+
                 );
               })}
             </div>
