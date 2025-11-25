@@ -13,6 +13,7 @@ import {
   crearPedido,
 } from "./ApiClient";
 import { useI18n } from "./i18n/I18nProvider";
+import { Link } from "react-router-dom";
 
 const PLATOS_INICIALES = [
   {
@@ -442,22 +443,22 @@ function App() {
   });
 
   const [platoActivoId, setPlatoActivoId] = useState(null);
-  const [pedido, setPedido] = useState([]);
+//  const [pedido, setPedido] = useState([]);
 
-  const agregarAlPedido = (plato) => {
-    setPedido((prev) => [...prev, plato]);
-  };
+//  const agregarAlPedido = (plato) => {
+//    setPedido((prev) => [...prev, plato]);
+//  };
 
-  const totalPedido = useMemo(
-    () => pedido.reduce((acc, p) => acc + p.precio, 0),
-    [pedido]
-  );
+//  const totalPedido = useMemo(
+//    () => pedido.reduce((acc, p) => acc + p.precio, 0),
+//    [pedido]
+//  );
 
-  const confirmarPedido = async () => {
-    if (pedido.length === 0) {
-      alert(t("app.alertEmptyOrder"));
-      return;
-    }
+//  const confirmarPedido = async () => {
+//    if (pedido.length === 0) {
+//      alert(t("app.alertEmptyOrder"));
+//      return;
+//    }
 
     const items = pedido.map((p) => ({
       platoId: p.id || p._id,
@@ -853,7 +854,7 @@ function App() {
               <p>{t("app.noDishesFound")}</p>
             )}
 
-            <div className="row row-cols-1 row-cols-md-2 row-cols-xl-2 g-4 lista-platos mt-2">
+            <div className="row row-cols-1 g-4 lista-platos mt-2">
 
               {platosFiltrados.map((plato) => {
                 const platoId = plato.id || plato._id;
@@ -891,12 +892,14 @@ function App() {
                           className="acciones-plato d-flex flex-column gap-2 mt-2"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <button
+                          <Link
+                            to="/pedidos"
                             className="btn-custom btn-primary-custom btn-small"
-                            onClick={() => agregarAlPedido(plato)}
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            {t("app.addToOrder")}
-                          </button>
+                            Ir a pedidos
+                          </Link>
+
 
                           <button
                             className="btn btn-outline-secondary btn-sm"
@@ -1122,37 +1125,6 @@ function App() {
                 )}
               </div>
             </form>
-          </div>
-
-          <div className="card p-3">
-            <h2 className="h5 mb-3">{t("app.orderSectionTitle")}</h2>
-
-            {pedido.length === 0 ? (
-              <p>{t("app.emptyOrder")}</p>
-            ) : (
-              <>
-                <ul className="lista-pedido mb-2">
-                  {pedido.map((p, i) => (
-                    <li key={i}>
-                      {p.nombre} — ${p.precio.toLocaleString("es-CL")}
-                    </li>
-                  ))}
-                </ul>
-
-                <p className="total mb-2">
-                  {t("app.totalLabel")}: $
-                  {totalPedido.toLocaleString("es-CL")}
-                </p>
-
-                <button
-                  className="btn btn-success w-100"
-                  type="button"
-                  onClick={confirmarPedido}
-                >
-                  {t("app.confirmOrder")}
-                </button>
-              </>
-            )}
           </div>
         </section>
       </main>
