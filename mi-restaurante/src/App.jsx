@@ -14,16 +14,12 @@ import {
 } from "./ApiClient";
 import { useI18n } from "./i18n/I18nProvider";
 
-
-
-
-
 const PLATOS_INICIALES = [
-
   {
     id: "8",
     nombre: "Falafel",
-    descripcion: "Croquetas fritas de garbanzos y especias, servidas con salsa de yogur.",
+    descripcion:
+      "Croquetas fritas de garbanzos y especias, servidas con salsa de yogur.",
     precio: 5990,
     tipo: "entrada",
     esFrio: false,
@@ -33,7 +29,15 @@ const PLATOS_INICIALES = [
     esAlcohol: false,
     esCarne: false,
     esSandwitch: false,
-    ingredientes: ["Garbanzos","Mix de especias", "Perejil", "Cebollín","Harina", "Aceite", "Salsa de yogur"],
+    ingredientes: [
+      "Garbanzos",
+      "Mix de especias",
+      "Perejil",
+      "Cebollín",
+      "Harina",
+      "Aceite",
+      "Salsa de yogur",
+    ],
   },
   {
     id: "9",
@@ -53,7 +57,8 @@ const PLATOS_INICIALES = [
   {
     id: "10",
     nombre: "Crema de zapallo",
-    descripcion: "Sopa cremosa de zapallo con un toque de crema y especias.",
+    descripcion:
+      "Sopa cremosa de zapallo con un toque de crema y especias.",
     precio: 6990,
     tipo: "entrada",
     esFrio: false,
@@ -63,7 +68,13 @@ const PLATOS_INICIALES = [
     esAlcohol: false,
     esCarne: false,
     esSandwitch: false,
-    ingredientes: ["Zapallo", "Cebolla", "Crema", "Caldo de verduras", "Mix de especias"],
+    ingredientes: [
+      "Zapallo",
+      "Cebolla",
+      "Crema",
+      "Caldo de verduras",
+      "Mix de especias",
+    ],
   },
   {
     id: "11",
@@ -78,12 +89,20 @@ const PLATOS_INICIALES = [
     esAlcohol: false,
     esCarne: false,
     esSandwitch: false,
-    ingredientes: ["Harina", "Yogur","Garbanzos","Tahini","Cilantro", "Limón" ],
+    ingredientes: [
+      "Harina",
+      "Yogur",
+      "Garbanzos",
+      "Tahini",
+      "Cilantro",
+      "Limón",
+    ],
   },
   {
     id: "12",
     nombre: "Fetuccini alfredo",
-    descripcion: "Pasta fetuccini en salsa cremosa de queso parmesano y crema.",
+    descripcion:
+      "Pasta fetuccini en salsa cremosa de queso parmesano y crema.",
     precio: 10990,
     tipo: "fondo",
     esFrio: false,
@@ -93,12 +112,19 @@ const PLATOS_INICIALES = [
     esAlcohol: false,
     esCarne: true,
     esSandwitch: false,
-    ingredientes: ["Fetuccini", "Queso parmesano", "Crema", "Jamon", "Nuez moscada"],
+    ingredientes: [
+      "Fetuccini",
+      "Queso parmesano",
+      "Crema",
+      "Jamon",
+      "Nuez moscada",
+    ],
   },
   {
     id: "13",
     nombre: "Fettuccini al pesto",
-    descripcion: "Pasta fetuccini con salsa pesto de albahaca, nueces y queso parmesano.",
+    descripcion:
+      "Pasta fetuccini con salsa pesto de albahaca, nueces y queso parmesano.",
     precio: 11990,
     tipo: "fondo",
     esFrio: false,
@@ -113,7 +139,8 @@ const PLATOS_INICIALES = [
   {
     id: "14",
     nombre: "Fetuccini bolonesa",
-    descripcion: "Pasta fetuccini con salsa bolonesa de carne y tomate.",
+    descripcion:
+      "Pasta fetuccini con salsa bolonesa de carne y tomate.",
     precio: 10990,
     tipo: "fondo",
     esFrio: false,
@@ -123,12 +150,20 @@ const PLATOS_INICIALES = [
     esAlcohol: false,
     esCarne: true,
     esSandwitch: false,
-    ingredientes: ["Fetuccini", "Carne", "Tomate", "Cebolla", "Ajo", "Zanahoria"],
+    ingredientes: [
+      "Fetuccini",
+      "Carne",
+      "Tomate",
+      "Cebolla",
+      "Ajo",
+      "Zanahoria",
+    ],
   },
   {
     id: "15",
     nombre: "Ravioles de carne a la bolognesa",
-    descripcion: "Ravioles rellenos de carne servidos con salsa bolognesa casera.",
+    descripcion:
+      "Ravioles rellenos de carne servidos con salsa bolognesa casera.",
     precio: 12990,
     tipo: "fondo",
     esFrio: false,
@@ -138,7 +173,7 @@ const PLATOS_INICIALES = [
     esAlcohol: false,
     esCarne: true,
     esSandwitch: false,
-    ingredientes: ["Ravioles","Carne","Tomate","Cebolla","Ajo","Zanahoria"],
+    ingredientes: ["Ravioles", "Carne", "Tomate", "Cebolla", "Ajo", "Zanahoria"],
   },
   {
     id: "16",
@@ -153,12 +188,13 @@ const PLATOS_INICIALES = [
     esAlcohol: false,
     esCarne: false,
     esSandwitch: false,
-    ingredientes: ["Penne","Tomate","Albahaca","Ajo"],
+    ingredientes: ["Penne", "Tomate", "Albahaca", "Ajo"],
   },
   {
     id: "17",
     nombre: "Hamburguesa clásica",
-    descripcion: "Hamburguesa de carne con lechuga, tomate, queso y salsa especial, acompañada de una porcion de papas fritas.",
+    descripcion:
+      "Hamburguesa de carne con lechuga, tomate, queso y salsa especial, acompañada de una porcion de papas fritas.",
     precio: 9990,
     tipo: "fondo",
     esFrio: false,
@@ -168,7 +204,15 @@ const PLATOS_INICIALES = [
     esAlcohol: false,
     esCarne: true,
     esSandwitch: true,
-    ingredientes: ["Pan brioche","Carne", "Lechuga", "Tomate", "Queso", "Salsa especial", "Papas fritas"],
+    ingredientes: [
+      "Pan brioche",
+      "Carne",
+      "Lechuga",
+      "Tomate",
+      "Queso",
+      "Salsa especial",
+      "Papas fritas",
+    ],
   },
   {
     id: "18",
@@ -188,7 +232,8 @@ const PLATOS_INICIALES = [
   {
     id: "19",
     nombre: "La Ranchera",
-    descripcion: "Hamburguesa con tocino, huevo frito y queso cheddar, acompañada de papas fritas.",
+    descripcion:
+      "Hamburguesa con tocino, huevo frito y queso cheddar, acompañada de papas fritas.",
     precio: 10990,
     tipo: "fondo",
     esFrio: false,
@@ -198,12 +243,23 @@ const PLATOS_INICIALES = [
     esAlcohol: false,
     esCarne: true,
     esSandwitch: true,
-    ingredientes: ["Pan brioche","250g Carne", "Tocino", "Huevo frito", "Queso cheddar", "cebolla caramelizada", "salsa BBQ", "salsa especial", "Papas fritas"],
+    ingredientes: [
+      "Pan brioche",
+      "250g Carne",
+      "Tocino",
+      "Huevo frito",
+      "Queso cheddar",
+      "cebolla caramelizada",
+      "salsa BBQ",
+      "salsa especial",
+      "Papas fritas",
+    ],
   },
   {
     id: "20",
     nombre: "Entraña a la parrilla",
-    descripcion: "Entraña jugosa a la parrilla, servida con papas rústicas y ensalada chilena.",
+    descripcion:
+      "Entraña jugosa a la parrilla, servida con papas rústicas y ensalada chilena.",
     precio: 15990,
     tipo: "fondo",
     esFrio: false,
@@ -218,7 +274,8 @@ const PLATOS_INICIALES = [
   {
     id: "21",
     nombre: "Bagel de salmón ahumado",
-    descripcion: "Bagel relleno de salmón ahumado, queso crema, lechuga y mostaza.",
+    descripcion:
+      "Bagel relleno de salmón ahumado, queso crema, lechuga y mostaza.",
     precio: 6990,
     tipo: "fondo",
     esFrio: false,
@@ -228,7 +285,14 @@ const PLATOS_INICIALES = [
     esAlcohol: false,
     esCarne: false,
     esSandwitch: true,
-    ingredientes: ["Bagel","Salmón ahumado", "Queso crema", "Lechuga", "Pepinillos", "Mostaza"],
+    ingredientes: [
+      "Bagel",
+      "Salmón ahumado",
+      "Queso crema",
+      "Lechuga",
+      "Pepinillos",
+      "Mostaza",
+    ],
   },
   {
     id: "22",
@@ -243,12 +307,20 @@ const PLATOS_INICIALES = [
     esAlcohol: false,
     esCarne: false,
     esSandwitch: true,
-    ingredientes: ["Pan integral","Berenjena asada", "Zucchini asado", "Pimiento asado", "Hummus", "Lechuga"],
+    ingredientes: [
+      "Pan integral",
+      "Berenjena asada",
+      "Zucchini asado",
+      "Pimiento asado",
+      "Hummus",
+      "Lechuga",
+    ],
   },
   {
     id: "23",
     nombre: "Bistec a lo pobre",
-    descripcion: "Bistec de carne servido con papas fritas, cebolla caramelizada y huevo frito.",
+    descripcion:
+      "Bistec de carne servido con papas fritas, cebolla caramelizada y huevo frito.",
     precio: 12990,
     tipo: "fondo",
     esFrio: false,
@@ -293,7 +365,8 @@ const PLATOS_INICIALES = [
   {
     id: "26",
     nombre: "Cheesecake de frutos rojos",
-    descripcion: "Porcion de cheesecake con base de galleta y cobertura de frutos rojos.",
+    descripcion:
+      "Porcion de cheesecake con base de galleta y cobertura de frutos rojos.",
     precio: 5500,
     tipo: "postre",
     esFrio: true,
@@ -303,73 +376,72 @@ const PLATOS_INICIALES = [
     esAlcohol: false,
     esCarne: false,
     esSandwitch: false,
-    ingredientes: ["Queso crema", "Galletas", "Mantequilla", "Frutos rojos", "Leche condensada"],
+    ingredientes: [
+      "Queso crema",
+      "Galletas",
+      "Mantequilla",
+      "Frutos rojos",
+      "Leche condensada",
+    ],
   },
-
 ];
 
-
-//Logica central de la app
+// Lógica central de la app
 function App() {
+  const [platos, setPlatos] = useState([]);
+  const [cargandoPlatos, setCargandoPlatos] = useState(true);
+  const [errorPlatos, setErrorPlatos] = useState(false);
+  const { lang, setLang, t } = useI18n();
 
-
-const [platos, setPlatos] = useState([]);
-const [cargandoPlatos, setCargandoPlatos] = useState(true);
-const [errorPlatos, setErrorPlatos] = useState(false);
-const { lang, setLang, t } = useI18n();
-
-useEffect(() => {
-  async function fetchPlatos() {
-    try {
-      const data = await obtenerPlatos();
-      setPlatos(data);
-    } catch (err) {
-      console.error(err);
-      setErrorPlatos(true);
-    } finally {
-      setCargandoPlatos(false);
+  useEffect(() => {
+    async function fetchPlatos() {
+      try {
+        const data = await obtenerPlatos();
+        setPlatos(data);
+      } catch (err) {
+        console.error(err);
+        setErrorPlatos(true);
+      } finally {
+        setCargandoPlatos(false);
+      }
     }
-  }
 
-  fetchPlatos();
-}, []);
+    fetchPlatos();
+  }, []);
 
+  const [busqueda, setBusqueda] = useState("");
+  const [tipo, setTipo] = useState("todos");
+  const [soloFríos, setSoloFríos] = useState(false);
+  const [soloVeganos, setSoloVeganos] = useState(false);
+  const [soloPastas, setSoloPastas] = useState(false);
+  const [soloMariscos, setSoloMariscos] = useState(false);
+  const [soloAlcohol, setSoloAlcohol] = useState(false);
+  const [soloCarnes, setSoloCarnes] = useState(false);
+  const [soloSandwitches, setSoloSandwitches] = useState(false);
 
-const [busqueda, setBusqueda] = useState("");
-const [tipo, setTipo] = useState("todos");
-const [soloFríos, setSoloFríos] = useState(false);
-const [soloVeganos, setSoloVeganos] = useState(false);
-const [soloPastas, setSoloPastas] = useState(false);
-const [soloMariscos, setSoloMariscos] = useState(false);
-const [soloAlcohol, setSoloAlcohol] = useState(false);
-const [soloCarnes, setSoloCarnes] = useState(false);
-const [soloSandwitches, setSoloSandwitches] = useState(false);
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [macroData, setMacroData] = useState(null);
+  const [cargandoMacros, setCargandoMacros] = useState(false);
 
-const [modalAbierto, setModalAbierto] = useState(false);
-const [macroData, setMacroData] = useState(null);
-const [cargandoMacros, setCargandoMacros] = useState(false);  // ← NUEVO
+  const [editando, setEditando] = useState(null);
+  const [form, setForm] = useState({
+    nombre: "",
+    descripcion: "",
+    precio: "",
+    tipo: "entrada",
+    esFrio: false,
+    esVegano: false,
+    esPasta: false,
+    esMarisco: false,
+    esAlcohol: false,
+    esCarne: false,
+    esSandwitch: false,
+    ingredientesTexto: "",
+  });
 
+  const [platoActivoId, setPlatoActivoId] = useState(null);
+  const [pedido, setPedido] = useState([]);
 
-
-const [editando, setEditando] = useState(null);
-const [form, setForm] = useState({
-  nombre: "",
-  descripcion: "",
-  precio: "",
-  tipo: "entrada",
-  esFrio: false,
-  esVegano: false,
-  esPasta: false,
-  esMarisco: false,
-  esAlcohol: false,
-  esCarne: false,
-  esSandwitch: false,
-  ingredientesTexto: "",
-});
-
-
-const [platoActivoId, setPlatoActivoId] = useState(null);
-const [pedido, setPedido] = useState([]);
   const agregarAlPedido = (plato) => {
     setPedido((prev) => [...prev, plato]);
   };
@@ -380,35 +452,32 @@ const [pedido, setPedido] = useState([]);
   );
 
   const confirmarPedido = async () => {
-  if (pedido.length === 0) {
-  alert(t("app.alertEmptyOrder"));
-  return;
-}
+    if (pedido.length === 0) {
+      alert(t("app.alertEmptyOrder"));
+      return;
+    }
 
-  const items = pedido.map((p) => ({
-    platoId: p.id || p._id,
-    nombre: p.nombre,
-    precioUnitario: p.precio,
-    cantidad: 1, // si más adelante manejas cantidades, cámbialo
-  }));
+    const items = pedido.map((p) => ({
+      platoId: p.id || p._id,
+      nombre: p.nombre,
+      precioUnitario: p.precio,
+      cantidad: 1,
+    }));
 
-  const payload = {
-    items,
-    total: totalPedido,
-    // opcional: usuarioId: usuario?.id || usuario?._id,
+    const payload = {
+      items,
+      total: totalPedido,
+    };
+
+    try {
+      await crearPedido(payload);
+      alert(t("app.orderSaved"));
+      setPedido([]);
+    } catch (err) {
+      console.error(err);
+      alert(t("app.orderSaveError"));
+    }
   };
-
-  try {
-    await crearPedido(payload);
-    alert("Pedido guardado en la base de datos.");
-    setPedido([]);
-
-  } catch (err) {
-    console.error(err);
-    alert(t("app.orderSaveError"));
-  }
-};
-
 
   const platosFiltrados = useMemo(() => {
     return platos.filter((plato) => {
@@ -427,7 +496,18 @@ const [pedido, setPedido] = useState([]);
 
       return true;
     });
-  }, [platos, busqueda, tipo, soloFríos, soloVeganos, soloPastas, soloMariscos, soloAlcohol, soloCarnes, soloSandwitches]);
+  }, [
+    platos,
+    busqueda,
+    tipo,
+    soloFríos,
+    soloVeganos,
+    soloPastas,
+    soloMariscos,
+    soloAlcohol,
+    soloCarnes,
+    soloSandwitches,
+  ]);
 
   const handleChangeForm = (e) => {
     const { name, value, type, checked } = e.target;
@@ -455,155 +535,179 @@ const [pedido, setPedido] = useState([]);
     });
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const precioNum = Number(form.precio);
-  if (Number.isNaN(precioNum) || precioNum <= 0) {
-  alert(t("app.priceMustBePositive"));
-  return;
-  }
+    const precioNum = Number(form.precio);
+    if (Number.isNaN(precioNum) || precioNum <= 0) {
+      alert(t("app.priceMustBePositive"));
+      return;
+    }
 
+    const ingredientesArray = form.ingredientesTexto
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
 
-  const ingredientesArray = form.ingredientesTexto
-    .split(",")
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
+    const payload = {
+      nombre: form.nombre,
+      descripcion: form.descripcion,
+      precio: precioNum,
+      tipo: form.tipo,
+      esFrio: form.esFrio,
+      esVegano: form.esVegano,
+      esPasta: form.esPasta,
+      esMarisco: form.esMarisco,
+      esAlcohol: form.esAlcohol,
+      esCarne: form.esCarne,
+      esSandwitch: form.esSandwitch,
+      ingredientes: ingredientesArray,
+    };
 
-  const payload = {
-    nombre: form.nombre,
-    descripcion: form.descripcion,
-    precio: precioNum,
-    tipo: form.tipo,
-    esFrio: form.esFrio,
-    esVegano: form.esVegano,
-    esPasta: form.esPasta,
-    esMarisco: form.esMarisco,
-    esAlcohol: form.esAlcohol,
-    esCarne: form.esCarne,
-    esSandwitch: form.esSandwitch,
-    ingredientes: ingredientesArray,
+    try {
+      if (editando) {
+        const actualizado = await actualizarPlato(editando, payload);
+
+        setPlatos((prev) =>
+          prev.map((p) =>
+            p.id === editando || p._id === editando ? actualizado : p
+          )
+        );
+      } else {
+        const creado = await crearPlato(payload);
+        setPlatos((prev) => [...prev, creado]);
+      }
+
+      limpiarFormulario();
+    } catch (err) {
+      console.error(err);
+      alert(t("app.dishSaveError"));
+    }
   };
 
-  try {
-    if (editando) {
-      // EDITAR
-      const actualizado = await actualizarPlato(editando, payload);
+  const handleEditar = (plato) => {
+    const platoId = plato.id || plato._id;
+    setEditando(platoId);
+    setForm({
+      nombre: plato.nombre,
+      descripcion: plato.descripcion,
+      precio: String(plato.precio),
+      tipo: plato.tipo,
+      esFrio: plato.esFrio,
+      esVegano: plato.esVegano,
+      esPasta: plato.esPasta,
+      esMarisco: plato.esMarisco,
+      esAlcohol: plato.esAlcohol,
+      esCarne: plato.esCarne,
+      esSandwitch: plato.esSandwitch,
+      ingredientesTexto: plato.ingredientes?.join(", ") || "",
+    });
+  };
 
-      setPlatos((prev) =>
-        prev.map((p) => (p.id === editando || p._id === editando ? actualizado : p))
-      );
-    } else {
-      // CREAR
-      const creado = await crearPlato(payload);
-      setPlatos((prev) => [...prev, creado]);
-    }
+  const handleEliminar = async (id) => {
+    if (!confirm(t("app.confirmDeleteDish"))) return;
 
-    limpiarFormulario();
-  } catch (err) {
-    console.error(err);
-    alert(t("app.dishSaveError"));
-  }
-};
-
-
-const handleEditar = (plato) => {
-  const platoId = plato.id || plato._id;
-  setEditando(platoId);
-  setForm({
-    nombre: plato.nombre,
-    descripcion: plato.descripcion,
-    precio: String(plato.precio),
-    tipo: plato.tipo,
-    esFrio: plato.esFrio,
-    esVegano: plato.esVegano,
-    esPasta: plato.esPasta,
-    esMarisco: plato.esMarisco,
-    esAlcohol: plato.esAlcohol,
-    esCarne: plato.esCarne,
-    esSandwitch: plato.esSandwitch,
-    ingredientesTexto: plato.ingredientes?.join(", ") || "",
-  });
-};
-
-
-const handleEliminar = async (id) => {
-  if (!confirm(t("app.confirmDeleteDish"))) return;
-
-  try {
-    await eliminarPlato(id);
-    setPlatos((prev) => prev.filter((p) => p.id !== id && p._id !== id));
-  } catch (err) {
-    console.error(err);
-    alert(t("app.dishDeleteError"));
-  }
-};
-
-const verMacros = async (plato) => {
-  try {
-    setCargandoMacros(true);
-    setMacroData(null); // opcional, por si quieres limpiar lo anterior
-
-    const data = await obtenerIANutricion(plato.nombre);
-    setMacroData(data);
-    setModalAbierto(true);
-  } catch (err) {
-    console.error(err);
-    alert(t("app.macroError"));
-  } finally {
-    setCargandoMacros(false);
-  }
-};
-
-
-// === AUTH ===
-const [usuario, setUsuario] = useState(null);
-const handleLogout = () => {
-  setToken(null);
-  setUsuario(null);
-};
-
-// Cargar usuario al montar si ya hay token guardado
-useEffect(() => {
-  const token = getToken();
-  if (!token || usuario) return; // si no hay token o ya tengo usuario, no hago nada
-
-  (async () => {
     try {
-      const data = await apiRequest("/api/auth/profile");
-      setUsuario(data.usuario);
+      await eliminarPlato(id);
+      setPlatos((prev) => prev.filter((p) => p.id !== id && p._id !== id));
     } catch (err) {
-      console.error("No se pudo cargar el perfil, limpiando token", err);
-      setToken(null);
-      setUsuario(null);
+      console.error(err);
+      alert(t("app.dishDeleteError"));
     }
-  })();
-}, [usuario]);
+  };
+
+  const verMacros = async (plato) => {
+    try {
+      setCargandoMacros(true);
+      setMacroData(null);
+
+      const data = await obtenerIANutricion(plato.nombre);
+      setMacroData(data);
+      setModalAbierto(true);
+    } catch (err) {
+      console.error(err);
+      alert(t("app.macroError"));
+    } finally {
+      setCargandoMacros(false);
+    }
+  };
+
+  // === AUTH ===
+  const [usuario, setUsuario] = useState(null);
+
+  const handleLogout = () => {
+    setToken(null);
+    setUsuario(null);
+  };
+
+  useEffect(() => {
+    const token = getToken();
+    if (!token || usuario) return;
+
+    (async () => {
+      try {
+        const data = await apiRequest("/api/auth/profile");
+        setUsuario(data.usuario);
+      } catch (err) {
+        console.error("No se pudo cargar el perfil, limpiando token", err);
+        setToken(null);
+        setUsuario(null);
+      }
+    })();
+  }, [usuario]);
+
   // Si no hay usuario logueado, mostrar pantalla de login
   if (!usuario && !getToken()) {
     return <Auth onAuth={setUsuario} />;
   }
+
   return (
     <div className="app">
       <header className="header">
-        <h1>Restaurante "Nombre Restaurante"</h1>
-        {usuario && (
-          <div>
-            <span style={{ marginRight: "1rem" }}>
-              Hola, {usuario.nombre || usuario.email}
-            </span>
-            <button className="btn secundario" onClick={handleLogout}>
-              Cerrar sesión
-            </button>
-          </div>
-        )}
+        <h1>{t("layout.appTitle")}</h1>
+
+        <div
+          className="header-controls"
+          style={{
+            display: "flex",
+            gap: "1rem",
+            alignItems: "center",
+            marginLeft: "auto",
+          }}
+        >
+          <label className="selector-idioma">
+            {t("layout.languageLabel")}{" "}
+            <select
+              value={lang}
+              onChange={(e) => setLang(e.target.value)}
+            >
+              <option value="es">{t("layout.spanish")}</option>
+              <option value="en">{t("layout.english")}</option>
+            </select>
+          </label>
+
+          {usuario && (
+            <div style={{ textAlign: "right" }}>
+              <div
+                className="usuario-conectado"
+                style={{ fontSize: "0.9rem", opacity: 0.9 }}
+              >
+                {t("layout.connectedAs")}{" "}
+                <strong>{usuario.nombre || usuario.email}</strong>
+              </div>
+              <button className="btn secundario" onClick={handleLogout}>
+                {t("app.logout")}
+              </button>
+            </div>
+          )}
+        </div>
       </header>
+
       <main className="layout">
-        
         {/* Menú + filtros */}
         <section className="col principal">
           <div className="card filtros">
-            <h2>Buscar y filtrar</h2>
+            <h2>{t("app.filtersTitle")}</h2>
             <input
               type="text"
               placeholder={t("app.searchPlaceholder")}
@@ -692,11 +796,15 @@ useEffect(() => {
           </div>
 
           <div className="card">
-            <h2>Menú</h2>
+            <h2>{t("app.menuTitle")}</h2>
 
             {cargandoPlatos && <p>{t("app.loadingDishes")}</p>}
             {errorPlatos && (
               <p style={{ color: "red" }}>{t("app.errorLoadDishes")}</p>
+            )}
+
+            {!cargandoPlatos && platosFiltrados.length === 0 && (
+              <p>{t("app.noDishesFound")}</p>
             )}
 
             <div className="lista-platos">
@@ -709,7 +817,9 @@ useEffect(() => {
                     key={platoId}
                     className={`plato ${abierto ? "plato-abierto" : ""}`}
                     onClick={() =>
-                      setPlatoActivoId((prev) => (prev === platoId ? null : platoId))
+                      setPlatoActivoId((prev) =>
+                        prev === platoId ? null : platoId
+                      )
                     }
                   >
                     <div className="plato-contenido">
@@ -722,20 +832,25 @@ useEffect(() => {
 
                       <p className="descripcion">{plato.descripcion}</p>
 
-                      {abierto && plato.ingredientes && plato.ingredientes.length > 0 && (
-                        <ul className="ingredientes">
-                          {plato.ingredientes.map((ing, i) => (
-                            <li key={i}>{ing}</li>
-                          ))}
-                        </ul>
-                      )}
+                      {abierto &&
+                        plato.ingredientes &&
+                        plato.ingredientes.length > 0 && (
+                          <ul className="ingredientes">
+                            {plato.ingredientes.map((ing, i) => (
+                              <li key={i}>{ing}</li>
+                            ))}
+                          </ul>
+                        )}
                     </div>
 
                     <div
                       className="acciones-plato"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <button className="btn" onClick={() => agregarAlPedido(plato)}>
+                      <button
+                        className="btn"
+                        onClick={() => agregarAlPedido(plato)}
+                      >
                         {t("app.addToOrder")}
                       </button>
 
@@ -759,22 +874,24 @@ useEffect(() => {
                         style={{ marginTop: "0.3rem" }}
                         disabled={cargandoMacros}
                       >
-                        {cargandoMacros ? t("app.loading") : t("app.viewMacros")}
+                        {cargandoMacros
+                          ? t("app.loading")
+                          : t("app.viewMacros")}
                       </button>
                     </div>
                   </article>
                 );
               })}
-
             </div>
-
           </div>
         </section>
 
         {/* Formulario + Pedido */}
         <section className="col lateral">
           <div className="card">
-            <h2>{editando ? t("app.editDishTitle") : t("app.newDishTitle")}</h2>
+            <h2>
+              {editando ? t("app.editDishTitle") : t("app.newDishTitle")}
+            </h2>
 
             <form onSubmit={handleSubmit} className="form-plato">
               <label>
@@ -798,7 +915,6 @@ useEffect(() => {
 
               <label>
                 {t("app.fieldIngredients")}
-
                 <textarea
                   name="ingredientesTexto"
                   value={form.ingredientesTexto}
@@ -916,7 +1032,7 @@ useEffect(() => {
                     type="button"
                     onClick={limpiarFormulario}
                   >
-                    Cancelar
+                    {t("app.formCancel")}
                   </button>
                 )}
               </div>
@@ -939,65 +1055,98 @@ useEffect(() => {
                 </ul>
 
                 <p className="total">
-                  {t("app.totalLabel")}: ${totalPedido.toLocaleString("es-CL")}
+                  {t("app.totalLabel")}: $
+                  {totalPedido.toLocaleString("es-CL")}
                 </p>
 
-                <button className="btn" type="button" onClick={confirmarPedido}>
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={confirmarPedido}
+                >
                   {t("app.confirmOrder")}
                 </button>
               </>
             )}
           </div>
-
         </section>
       </main>
-          {modalAbierto && macroData && (
-  <div className="modal-fondo" onClick={() => setModalAbierto(false)}>
-    <div className="modal" onClick={(e) => e.stopPropagation()}>
-      <h2>{t("macro.title")}</h2>
 
-      <p>
-        <strong>{t("macro.dishLabel")} </strong>
-        {macroData.nombre_original}
-      </p>
-      <p>
-        <strong>{t("macro.translationLabel")} </strong>
-        {macroData.traduccion}
-      </p>
+      {modalAbierto && macroData && (
+        <div
+          className="modal-fondo"
+          onClick={() => setModalAbierto(false)}
+        >
+          <div
+            className="modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2>{t("macro.title")}</h2>
 
-      <h3>{t("macro.totalsTitle")}</h3>
-      <div className="macro-totales">
-        <p><strong>Calorías:</strong> {macroData.total.calories} kcal</p>
-        <p><strong>Proteína:</strong> {macroData.total.protein_g} g</p>
-        <p><strong>Grasas:</strong> {macroData.total.fat_g} g</p>
-        <p><strong>Carbohidratos:</strong> {macroData.total.carbs_g} g</p>
-      </div>
+            <p>
+              <strong>{t("macro.dishLabel")} </strong>
+              {macroData.nombre_original}
+            </p>
+            <p>
+              <strong>{t("macro.translationLabel")} </strong>
+              {macroData.traduccion}
+            </p>
 
-      <h3>{t("macro.ingredientsTitle")}</h3>
-      <ul className="ingredientes-macro">
-        {macroData.ingredientes.map((i, idx) => (
-          <li key={idx}>
-            <strong>{i.name}</strong> — {i.weight_g}g
-            <br />
-            {i.calories.toFixed(0)} kcal ·{" "}
-            {i.protein_g.toFixed(1)}g prot ·{" "}
-            {i.fat_g.toFixed(1)}g grasa ·{" "}
-            {i.carbs_g.toFixed(1)}g carb
-          </li>
-        ))}
-      </ul>
+            <h3>{t("macro.totalsTitle")}</h3>
+            <div className="macro-totales">
+              <p>
+                <strong>Calorías:</strong>{" "}
+                {macroData.total.calories} kcal
+              </p>
+              <p>
+                <strong>Proteína:</strong>{" "}
+                {macroData.total.protein_g} g
+              </p>
+              <p>
+                <strong>Grasas:</strong>{" "}
+                {macroData.total.fat_g} g
+              </p>
+              <p>
+                <strong>Carbohidratos:</strong>{" "}
+                {macroData.total.carbs_g} g
+              </p>
+            </div>
 
-      <button
-        className="btn cerrar-modal"
-        onClick={() => setModalAbierto(false)}
-      >
-        {t("macro.closeButton")}
-      </button>
-    </div>
-  </div>
-)}
+            <h3>{t("macro.ingredientsTitle")}</h3>
+            <ul className="ingredientes-macro">
+              {macroData.ingredientes.map((i, idx) => (
+                <li key={idx}>
+                  <strong>{i.name}</strong> — {i.weight_g}g
+                  <br />
+                  {i.calories.toFixed(0)} kcal ·{" "}
+                  {i.protein_g.toFixed(1)}g prot ·{" "}
+                  {i.fat_g.toFixed(1)}g grasa ·{" "}
+                  {i.carbs_g.toFixed(1)}g carb
+                </li>
+              ))}
+            </ul>
 
+            <button
+              className="btn cerrar-modal"
+              onClick={() => setModalAbierto(false)}
+            >
+              {t("macro.closeButton")}
+            </button>
+          </div>
+        </div>
+      )}
 
+      {cargandoMacros && !modalAbierto && (
+        <div className="modal-fondo">
+          <div
+            className="modal modal-loading"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="spinner" />
+            <p>{t("macro.loadingText")}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

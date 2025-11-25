@@ -3,7 +3,8 @@
     "appTitle": "My Smart Restaurant",
     "languageLabel": "Language",
     "spanish": "Spanish",
-    "english": "English"
+    "english": "English",
+    "connectedAs": "Signed in as:"
   },
   "auth": {
     "titleLogin": "Log in",
@@ -26,7 +27,7 @@
   "app": {
     "welcomeUser": "Hi, {{name}}",
     "logout": "Log out",
-    "connectedAs": "Signed in as:",
+    
 
     "filtersTitle": "Search and filter",
     "menuTitle": "Menu",

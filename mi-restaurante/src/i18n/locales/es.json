@@ -3,7 +3,8 @@
     "appTitle": "Mi Restaurante Inteligente",
     "languageLabel": "Idioma",
     "spanish": "Español",
-    "english": "Inglés"
+    "english": "Inglés",
+    "connectedAs": "Conectado como:"
   },
   "auth": {
     "titleLogin": "Iniciar sesión",
@@ -27,7 +28,7 @@
     "welcomeUser": "Hola, {{name}}",
     "logout": "Cerrar sesión",
 
-    "connectedAs": "Conectado como:",
+    
 
     "filtersTitle": "Buscar y filtrar",
     "menuTitle": "Menú",
