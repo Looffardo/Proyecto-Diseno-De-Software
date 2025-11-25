@@ -712,7 +712,7 @@ function App() {
 
       <main className="row g-4 layout">
         {/* Menú + filtros */}
-        <section className="col-12 col-lg-8 principal">
+        <section className="col-12 col-lg-6 principal">
           <div className="card filtros mb-4 p-3">
             <h2 className="h5 mb-3">{t("app.filtersTitle")}</h2>
             <input
@@ -938,7 +938,7 @@ function App() {
         </section>
 
         {/* Formulario + Pedido */}
-        <section className="col-12 col-lg-4 lateral">
+        <section className="col-12 col-lg-6 lateral">
           <div className="card mb-4 p-3">
             <h2 className="h5 mb-3">
               {editando ? t("app.editDishTitle") : t("app.newDishTitle")}
