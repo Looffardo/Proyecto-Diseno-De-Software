@@ -700,7 +700,7 @@ function App() {
                 <strong>{usuario.nombre || usuario.email}</strong>
               </div>
               <button
-                className="btn btn-outline-secondary btn-sm"
+                className="btn-custom btn-small"
                 onClick={handleLogout}
               >
                 {t("app.logout")}
@@ -898,7 +898,7 @@ function App() {
                         onClick={(e) => e.stopPropagation()}
                       >
                         <button
-                          className="btn btn-primary btn-sm"
+                          className="btn-custom btn-primary-custom btn-small"
                           onClick={() => agregarAlPedido(plato)}
                         >
                           {t("app.addToOrder")}
@@ -1113,7 +1113,7 @@ function App() {
               </div>
 
               <div className="form-acciones d-flex gap-2 mt-3">
-                <button className="btn btn-primary" type="submit">
+                <button className="btn-custom btn-primary-custom" type="submit">
                   {editando ? t("app.formSave") : t("app.formCreate")}
                 </button>
 

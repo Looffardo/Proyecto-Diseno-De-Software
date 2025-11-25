@@ -381,3 +381,43 @@ body {
   text-align: center;
   font-size: 0.9rem;
 }
+
+/* Neutralizar Bootstrap para no romper tamaños */
+
+.btn,
+.form-control,
+.card,
+.container {
+  all: unset;
+  display: revert;
+  box-sizing: border-box;
+}
+
+/* === Botones personalizados === */
+
+.btn-custom {
+  background: #2563eb;
+  color: white;
+  padding: 0.4rem 0.9rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-custom:hover {
+  opacity: 0.9;
+}
+
+.btn-primary-custom {
+  background: #2563eb;
+}
+
+.btn-danger-custom {
+  background: #dc2626;
+}
+
+.btn-small {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.85rem;
+}
