@@ -240,90 +240,79 @@ const chatbotRouter = require("./rutas/chatbot");
 app.use("/api/chatbot", chatbotRouter);
 
 // ================================================================
-// ======================= CHATBOT GEMINI ==========================
+// ========================= CHATBOT IA ===========================
 // ================================================================
-app.post("/api/chat-recomendador", authMiddleware, async (req, res) => {
+app.post("/api/chatbot", async (req, res) => {
   try {
-    const { mensaje, platos } = req.body;
+    const { message, preferencias } = req.body || {};
 
-    if (!mensaje) {
-      return res.status(400).json({ mensaje: "Falta el campo 'mensaje'" });
+    if (!message) {
+      return res.status(400).json({ mensaje: "Falta message en el body" });
     }
 
     if (!process.env.GEMINI_API_KEY) {
-      return res.status(500).json({ mensaje: "GEMINI_API_KEY no configurada" });
+      console.error("GEMINI_API_KEY no está configurada");
+      return res.status(500).json({ mensaje: "Falta configuración de IA" });
     }
 
-    // Preparamos contexto de platos (solo lo necesario)
-    const platosContexto = Array.isArray(platos)
-      ? platos.map((p) => ({
-          nombre: p.nombre,
-          descripcion: p.descripcion,
-          tipo: p.tipo,
-          esVegano: p.esVegano,
-          esMarisco: p.esMarisco,
-          esCarne: p.esCarne,
-          precio: p.precio,
-        }))
-      : [];
+    // Construimos un prompt simple usando el mensaje y, opcionalmente, preferencias
+    const preferenciasTexto = preferencias
+      ? `\nPreferencias del usuario (booleanos): ${JSON.stringify(preferencias)}`
+      : "";
 
     const prompt = `
-Eres el asistente de un restaurante. 
+Eres el asistente de un restaurante chileno.
+Tu tarea es recomendar 1 o 2 platos que ya existen en la carta, de forma breve.
 
-Tienes esta carta en formato JSON:
-${JSON.stringify(platosContexto, null, 2)}
+Reglas:
+- Responde SIEMPRE en español.
+- Máximo 3 líneas.
+- Usa un tono amable y directo.
+- Si el usuario pide "carne", "vegano", "mariscos", "postre", etc., recomiéndale platos acordes.
+- Si no tienes suficiente info, pide una aclaración corta.
 
-El usuario dirá cosas como:
-- "quiero algo vegano"
-- "recomiéndame un plato con carne"
-- "tengo ganas de mariscos"
-- "quiero un postre liviano"
-- etc.
-
-Tu tarea:
-1. Entender la preferencia del usuario.
-2. Elegir 1 a 3 platos de la carta que encajen bien.
-3. Responder en español, en 1 a 3 frases naturales, mencionando los nombres exactos de los platos.
-4. No inventes platos que no existan en la carta JSON.
-5. Si no hay platos que encajen, dilo y ofrece alternativas generales.
-
-Mensaje del usuario: "${mensaje}"
+Petición del usuario:
+"${message}"
+${preferenciasTexto}
 `;
 
-    const url =
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" +
-      process.env.GEMINI_API_KEY;
-
-    const geminiRes = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-      }),
-    });
-
-    const data = await geminiRes.json();
+    const geminiRes = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent" +
+        `?key=${process.env.GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: prompt }],
+            },
+          ],
+        }),
+      }
+    );
 
     if (!geminiRes.ok) {
-      console.error("Error Gemini:", data);
+      const errorText = await geminiRes.text();
+      console.error("Error desde Gemini:", geminiRes.status, errorText);
       return res
         .status(500)
-        .json({ mensaje: "Error al llamar a Gemini para el chatbot" });
+        .json({ mensaje: "Error consultando IA", detalle: errorText });
     }
 
-    const textoRespuesta =
+    const data = await geminiRes.json();
+    const texto =
       data.candidates?.[0]?.content?.parts
         ?.map((p) => p.text || "")
-        .join("") || "Lo siento, no pude generar una recomendación ahora.";
+        .join(" ")
+        .trim() || "Lo siento, no pude generar una recomendación en este momento.";
 
-    return res.json({ respuesta: textoRespuesta });
+    return res.json({ respuesta: texto });
   } catch (err) {
-    console.error("Error en /api/chat-recomendador:", err);
-    return res
-      .status(500)
-      .json({ mensaje: "Error interno en el chatbot del restaurante" });
+    console.error("Error en /api/chatbot:", err);
+    return res.status(500).json({ mensaje: "Error en IA del chatbot" });
   }
 });
 
