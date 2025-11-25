@@ -27,6 +27,7 @@
   "app": {
     "welcomeUser": "Hola, {{name}}",
     "logout": "Cerrar sesión",
+    "goOrder": "Ir a pedidos",
 
     
 

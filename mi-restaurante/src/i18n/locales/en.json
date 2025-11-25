@@ -27,7 +27,7 @@
   "app": {
     "welcomeUser": "Hi, {{name}}",
     "logout": "Log out",
-    
+    "goOrder": "Go to order",
 
     "filtersTitle": "Search and filter",
     "menuTitle": "Menu",
